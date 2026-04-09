@@ -1,0 +1,1531 @@
+<!-- test content --><!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CELLU+ AdSpy Dashboard</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- React & ReactDOM 18 from unpkg (production builds) -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+  <!-- Babel Standalone for JSX transpilation -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Lucide React Icons -->
+  <script src="https://unpkg.com/lucide-react@0.383.0/dist/umd/lucide-react.min.js"></script>
+
+  <!-- docx library -->
+  <script src="https://unpkg.com/docx@8.5.0/build/index.umd.js"></script>
+
+  <style>
+    body {
+      background: linear-gradient(to bottom right, #030712, #0f172a, #030712);
+      color: #f3f4f6;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useRef, useCallback, useEffect, useMemo } = React;
+    const { Plus, ChevronDown, Pencil, Trash2, Play, FileText, ExternalLink, X, Check,
+      Clock, AlertCircle, CheckCircle, Upload, Link, FolderOpen, Search,
+      Loader2, Eye, Package, Settings, ArrowLeft, Download, File, Image, FileSpreadsheet,
+      ThumbsUp, ThumbsDown, Bell, RefreshCw, TrendingUp, Zap } = lucideReact;
+
+    /* âââââââââââ GENERADOR DOCX PROFESIONAL âââââââââââ */
+
+    // docx library is already loaded from CDN
+    let docxLib = null;
+    async function loadDocxLib() {
+      if (docxLib) return docxLib;
+      return Promise.resolve(window.docx);
+    }
+
+    // Ad content templates for creative brief
+    function getAdContent(ad) {
+      const templates = {
+        "Sexualidad + Transformacion": {
+          hook: "Tu vida sexual merece atencion especial â y vos tambien.",
+          body: `${ad.brand === "O Positiv" ? "CELLU+" : ad.brand} cuida las partes mas intimas y vulnerables de tu cuerpo para que puedas disfrutar sin preocupaciones.\nâ Equilibra tu flora vaginal para sentirte segura.\nâ Apoya un pH saludable y controla el olor.\nâ Protege contra bacterias despues de las relaciones.\nMenos estres. Mas conexion. Mas vos.`,
+          cta: "Probalo Hoy â Envio Gratis",
+          visual: "Mujer sonriente en ropa interior comoda, paleta calida, producto en primer plano con fondo organico.",
+        },
+        "Rutina + Pareja": {
+          hook: "Â¿Cuantas veces dejaste pasar un momento por inseguridad?",
+          body: "CELLU+ Probiotico Vaginal te da la confianza que necesitas con cepas clinicamente estudiadas + extracto de arandano. Mas de 50.000 resenas de 5 estrellas. pH equilibrado, sin olor, sin estres.",
+          cta: "Empeza Tu Cambio Ahora",
+          visual: "Close-up de manos sosteniendo el frasco de CELLU+, fondo desenfocado de pareja, tonos naranjas calidos.",
+        },
+        "Testimonial UGC": {
+          hook: "Era super esceptica con los probioticos vaginales, pero despues de anos de infecciones recurrentes, estaba desesperada.",
+          body: "3 meses con CELLU+ y no tuve ni un solo problema. Mi pH esta equilibrado, no mas flujo raro, y por primera vez en anos me siento NORMAL. Si estas como estaba yo, dale una oportunidad.",
+          cta: "Transforma Tu Bienestar Intimo",
+          visual: "Formato UGC selfie-style, mujer real hablando a camara, subtitulos en espanol, estetica organica.",
+        },
+        "Anti-Antibioticos": {
+          hook: "Cada vez que tomas antibioticos, destruis tu flora vaginal. Y el ciclo se repite.",
+          body: "CELLU+ rompe ese ciclo restaurando las bacterias buenas que los antibioticos eliminan. Cepas probioticas clinicamente estudiadas + extracto de arandano. La solucion no es mas quimica, es mas biologia.",
+          cta: "Rompe el Ciclo",
+          visual: "Infografia simple: antibiotico -> destruccion flora -> CELLU+ -> restauracion. Colores naranjas y verdes.",
+        },
+      };
+      const t = templates[ad.angle] || {
+        hook: `Â¿Sabias que ${ad.angle.toLowerCase()} puede cambiar tu bienestar intimo?`,
+        body: `CELLU+ te ofrece una solucion natural con cepas probioticas clinicamente estudiadas. Equilibra tu flora vaginal, controla el olor y sentite segura todos los dias. Sin quimicos, sin artificiales.`,
+        cta: "Descubri CELLU+",
+        visual: `Estatico profesional con producto CELLU+ en primer plano, estetica limpia y moderna.`,
+      };
+      return { ...t, ref: `Original ad from ${ad.brand}: "${ad.headline}" - ${ad.days} days active, ${ad.status} status.` };
+    }
+
+    async function buildDocxBlob(type, productName, ads, competitors, contextFiles) {
+      const D = await loadDocxLib();
+      const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
+              Header, Footer, AlignmentType, BorderStyle, WidthType,
+              ShadingType, PageNumber, PageBreak } = D;
+
+      const today = new Date().toISOString().slice(0, 10);
+      const isCreative = type === "creative";
+      const fileName = isCreative
+        ? `CELLU_Adaptacion_Creativa_${today}.docx`
+        : `CELLU_Analisis_Estrategico_${today}.docx`;
+
+      const ORANGE = "E8751A";
+      const DARK = "333333";
+      const GRAY = "888888";
+      const LIGHT_GRAY = "F5F5F5";
+      const thinBorder = { style: BorderStyle.SINGLE, size: 1, color: "DDDDDD" };
+      const borders = { top: thinBorder, bottom: thinBorder, left: thinBorder, right: thinBorder };
+      const cm = { top: 60, bottom: 60, left: 100, right: 100 };
+      const months = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+      const now = new Date();
+      const dateStr = `${now.getDate()} de ${months[now.getMonth()]} ${now.getFullYear()}`;
+
+      const hCell = (text, w) => new TableCell({ borders, width: { size: w, type: WidthType.DXA }, shading: { fill: ORANGE, type: ShadingType.CLEAR }, margins: cm,
+        children: [new Paragraph({ children: [new TextRun({ text, bold: true, size: 18, color: "FFFFFF", font: "Calibri" })] })] });
+      const dCell = (text, w, opts = {}) => new TableCell({ borders, width: { size: w, type: WidthType.DXA },
+        shading: opts.bg ? { fill: opts.bg, type: ShadingType.CLEAR } : undefined, margins: cm,
+        children: [new Paragraph({ children: [new TextRun({ text, size: 18, color: opts.color || DARK, font: "Calibri", bold: opts.bold })] })] });
+
+      const allChildren = [];
+
+      // ââ COVER PAGE ââ
+      for (let i = 0; i < (isCreative ? 10 : 6); i++) allChildren.push(new Paragraph({ text: "" }));
+      allChildren.push(new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "CELLU+ AdSpy", bold: true, size: 56, color: ORANGE, font: "Calibri" })] }));
+      allChildren.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 200 }, children: [new TextRun({ text: isCreative ? "Brief Creativo para Disenador" : "Analisis Estrategico de Competencia", bold: true, size: 32, color: DARK, font: "Calibri" })] }));
+      allChildren.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 100 }, children: [new TextRun({ text: isCreative ? "Adaptaciones de Ads Competidores a Espanol Argentino" : "Hipotesis, Patrones Ganadores y Nuevos Angulos", size: 22, color: GRAY, font: "Calibri" })] }));
+      allChildren.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 200 }, children: [new TextRun({ text: dateStr, bold: true, size: 20, color: DARK, font: "Calibri" })] }));
+      if (isCreative) {
+        allChildren.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 100 }, children: [new TextRun({ text: `${ads.length} ads adaptados | ${competitors.length} competidores escaneados`, size: 20, color: GRAY, font: "Calibri" })] }));
+      }
+
+      if (isCreative) {
+        // ââ SUMMARY TABLE ââ
+        allChildren.push(new Paragraph({ children: [new PageBreak()] }));
+        allChildren.push(new Paragraph({ spacing: { before: 200, after: 100 }, children: [new TextRun({ text: "Resumen de Ads Adaptados", bold: true, size: 28, color: DARK, font: "Calibri" })] }));
+        allChildren.push(new Paragraph({ spacing: { after: 200 }, children: [new TextRun({ text: `Se adaptaron los ${ads.length} ads mas relevantes para CELLU+.`, size: 20, color: DARK, font: "Calibri" })] }));
+        const cw = [1200, 2000, 2800, 700, 900, 900];
+        allChildren.push(new Table({ width: { size: cw.reduce((a, b) => a + b, 0), type: WidthType.DXA }, columnWidths: cw,
+          rows: [
+            new TableRow({ children: [hCell("Marca", cw[0]), hCell("Angulo", cw[1]), hCell("Headline", cw[2]), hCell("Dias", cw[3]), hCell("Prior.", cw[4]), hCell("Status", cw[5])] }),
+            ...ads.map(ad => new TableRow({ children: [dCell(ad.brand, cw[0]), dCell(ad.angle, cw[1]), dCell(ad.headline, cw[2], { color: ORANGE }), dCell(`${ad.days}d`, cw[3]), dCell(ad.priority, cw[4], { color: ad.priority === "ALTA" ? ORANGE : GRAY, bold: true }), dCell(ad.status, cw[5])] }))
+          ]
+        }));
+
+        // ââ INDIVIDUAL AD PAGES ââ
+        ads.forEach((ad, idx) => {
+          const content = getAdContent(ad);
+          const mw = [2200, 2200, 2200, 2200];
+          allChildren.push(new Paragraph({ children: [new PageBreak()] }));
+          allChildren.push(new Paragraph({ spacing: { after: 150 }, children: [new TextRun({ text: `Ad #${idx + 1}  `, bold: true, size: 24, color: ORANGE, font: "Calibri" }), new TextRun({ text: ad.angle, size: 24, color: DARK, font: "Calibri" })] }));
+          allChildren.push(new Table({ width: { size: mw.reduce((a, b) => a + b, 0), type: WidthType.DXA }, columnWidths: mw,
+            rows: [new TableRow({ children: [dCell(`Marca: ${ad.brand}`, mw[0], { bg: LIGHT_GRAY }), dCell(`Dias activo: ${ad.days}`, mw[1], { bg: LIGHT_GRAY }), dCell(`Prioridad: ${ad.priority}`, mw[2], { bg: LIGHT_GRAY, bold: true }), dCell(`Status: ${ad.status}`, mw[3], { bg: LIGHT_GRAY })] })]
+          }));
+          allChildren.push(new Paragraph({ spacing: { before: 200 }, border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: ORANGE, space: 1 } }, children: [] }));
+          allChildren.push(new Paragraph({ text: "" }));
+          allChildren.push(new Paragraph({ spacing: { before: 100 }, children: [new TextRun({ text: "HEADLINE", size: 16, color: GRAY, font: "Calibri", bold: true })] }));
+          allChildren.push(new Paragraph({ spacing: { before: 60, after: 100 }, children: [new TextRun({ text: ad.headline, size: 28, color: ORANGE, font: "Calibri" })] }));
+          allChildren.push(new Paragraph({ children: [new TextRun({ text: "HOOK (primeras lineas)", size: 16, color: GRAY, font: "Calibri", bold: true })] }));
+          allChildren.push(new Paragraph({ spacing: { before: 60, after: 100 }, children: [new TextRun({ text: content.hook, size: 22, color: DARK, font: "Calibri", bold: true, italics: true })] }));
+          allChildren.push(new Paragraph({ children: [new TextRun({ text: "CUERPO DEL AD", size: 16, color: GRAY, font: "Calibri", bold: true })] }));
+          content.body.split("\n").forEach(line => allChildren.push(new Paragraph({ spacing: { before: 40 }, children: [new TextRun({ text: line, size: 20, color: DARK, font: "Calibri" })] })));
+          allChildren.push(new Paragraph({ text: "" }));
+          allChildren.push(new Paragraph({ children: [new TextRun({ text: "CTA", size: 16, color: GRAY, font: "Calibri", bold: true })] }));
+          allChildren.push(new Paragraph({ spacing: { before: 60, after: 100 }, children: [new TextRun({ text: content.cta, size: 24, color: ORANGE, font: "Calibri", bold: true })] }));
+          allChildren.push(new Paragraph({ children: [new TextRun({ text: "DIRECCION VISUAL", size: 16, color: GRAY, font: "Calibri", bold: true })] }));
+          allChildren.push(new Paragraph({ spacing: { before: 60 }, children: [new TextRun({ text: content.visual, size: 20, color: DARK, font: "Calibri" })] }));
+          allChildren.push(new Paragraph({ spacing: { before: 200, after: 200 }, border: { bottom: { style: BorderStyle.SINGLE, size: 1, color: "CCCCCC", space: 1 } }, children: [] }));
+          allChildren.push(new Paragraph({ spacing: { before: 100 }, children: [new TextRun({ text: "REFERENCIA (ad original)", size: 14, color: GRAY, font: "Calibri" })] }));
+          allChildren.push(new Paragraph({ spacing: { before: 60 }, children: [new TextRun({ text: content.ref, size: 18, color: GRAY, font: "Calibri", italics: true })] }));
+        });
+
+      } else {
+        // ââ ANALISIS ESTRATEGICO ââ
+        const angleCounts = {};
+        const statusCounts = {};
+        ads.forEach(a => { angleCounts[a.angle] = (angleCounts[a.angle] || 0) + 1; statusCounts[a.status] = (statusCounts[a.status] || 0) + 1; });
+        const avgDays = Math.round(ads.reduce((s, a) => s + a.days, 0) / (ads.length || 1));
+        const winners = ads.filter(a => a.status === "winner");
+        const topAngles = Object.entries(angleCounts).sort((a, b) => b[1] - a[1]);
+
+        // Section 1: Market Overview
+        allChildren.push(new Paragraph({ children: [new PageBreak()] }));
+        allChildren.push(new Paragraph({ spacing: { before: 300, after: 150 }, children: [new TextRun({ text: "1. Panorama General del Mercado", bold: true, size: 28, color: ORANGE, font: "Calibri" })] }));
+        const mcw = [2200, 1500, 2200, 2900];
+        allChildren.push(new Table({ width: { size: mcw.reduce((a, b) => a + b, 0), type: WidthType.DXA }, columnWidths: mcw,
+          rows: [
+            new TableRow({ children: [hCell("Competidor", mcw[0]), hCell("Ads Activos", mcw[1]), hCell("Ads Winners", mcw[2]), hCell("Enfoque Principal", mcw[3])] }),
+            ...competitors.map(c => {
+              const cAds = ads.filter(a => a.brand === c.name);
+              const cWin = cAds.filter(a => a.status === "winner");
+              return new TableRow({ children: [dCell(c.name, mcw[0]), dCell(`${cAds.length}`, mcw[1]), dCell(`${cWin.length}`, mcw[2]), dCell(c.query, mcw[3])] });
+            })
+          ]
+        }));
+        allChildren.push(new Paragraph({ text: "" }));
+
+        // Section 2: Patterns
+        allChildren.push(new Paragraph({ spacing: { before: 300, after: 150 }, children: [new TextRun({ text: "2. Patrones Ganadores Detectados", bold: true, size: 28, color: ORANGE, font: "Calibri" })] }));
+        topAngles.slice(0, 6).forEach(([angle, count], i) => {
+          const score = Math.max(70, 95 - i * 5);
+          allChildren.push(new Paragraph({ spacing: { before: 200, after: 60 }, children: [
+            new TextRun({ text: `${i + 1}. ${angle}`, bold: true, size: 22, color: ORANGE, font: "Calibri" }),
+            new TextRun({ text: `  (Score: ${score}/100 | Frecuencia: ${count} ads)`, size: 16, color: GRAY, font: "Calibri" }),
+          ]}));
+          allChildren.push(new Paragraph({ spacing: { before: 40, after: 40 }, children: [new TextRun({ text: `Angulo presente en ${count} de los ${ads.length} ads analizados. Promedio de ${avgDays} dias activo en este patron.`, size: 20, color: DARK, font: "Calibri" })] }));
+        });
+
+        // Section 3: Hypotheses
+        allChildren.push(new Paragraph({ spacing: { before: 300, after: 150 }, children: [new TextRun({ text: "3. Hipotesis Estrategicas para CELLU+", bold: true, size: 28, color: ORANGE, font: "Calibri" })] }));
+        const hypotheses = [
+          { h: `El angulo "${topAngles[0]?.[0] || 'principal'}" sera el de mayor ROAS para CELLU+ en Argentina.`, ev: `Es el patron #1 en frecuencia. Culturalmente adaptable al mercado argentino.`, ac: `Producir 3-5 videos UGC con mujeres argentinas reales. Formato vertical 15-30 seg.` },
+          { h: `Los ads de "validacion de pareja" generaran el mayor engagement en Instagram.`, ev: `La validacion de pareja tiene peso emocional alto en la cultura argentina.`, ac: `Crear 2-3 ads con angulo de pareja. Formato reel con subtitulos.` },
+          { h: `Los winners con +${avgDays} dias confirman oportunidad de mercado.`, ev: `${winners.length} winners detectados. Longevidad indica rentabilidad sostenida.`, ac: `Adaptar los winners directamente. Son ads probados, bajo riesgo.` },
+        ];
+        hypotheses.forEach((hyp, i) => {
+          allChildren.push(new Paragraph({ children: [new TextRun({ text: `Hipotesis ${i + 1}:`, size: 18, color: GRAY, font: "Calibri" })] }));
+          allChildren.push(new Paragraph({ spacing: { before: 60, after: 60 }, children: [new TextRun({ text: `"${hyp.h}"`, bold: true, size: 20, color: DARK, font: "Calibri", italics: true })] }));
+          allChildren.push(new Paragraph({ spacing: { before: 40 }, children: [new TextRun({ text: "Evidencia: ", size: 18, color: ORANGE, font: "Calibri", bold: true }), new TextRun({ text: hyp.ev, size: 18, color: DARK, font: "Calibri" })] }));
+          allChildren.push(new Paragraph({ spacing: { before: 40, after: 100 }, children: [new TextRun({ text: "Accion recomendada: ", size: 18, color: ORANGE, font: "Calibri", bold: true }), new TextRun({ text: hyp.ac, size: 18, color: DARK, font: "Calibri" })] }));
+        });
+
+        // Section 4: New Angles
+        allChildren.push(new Paragraph({ spacing: { before: 300, after: 150 }, children: [new TextRun({ text: "4. Nuevos Angulos Originales para CELLU+", bold: true, size: 28, color: ORANGE, font: "Calibri" })] }));
+        allChildren.push(new Paragraph({ spacing: { after: 150 }, children: [new TextRun({ text: "Estos angulos NO existen en la competencia. Son oportunidades unicas.", size: 20, color: DARK, font: "Calibri", italics: true })] }));
+        const angles = [
+          { t: "Angulo Argento: Cultura Local", h: "En Argentina Lo Resolvemos Diferente.", c: "Usar jerga local, humor sutil y referencias culturales argentinas.", f: "Video UGC o estatico con estetica informal argentina" },
+          { t: "Angulo Menstrual: El Ciclo Completo", h: "Tu Flora Cambia con Tu Ciclo. CELLU+ Tambien.", c: "Conectar probioticos con el ciclo menstrual. Companero de todo el mes.", f: "Carrusel educativo con calendario + iconos por fase" },
+          { t: "Angulo Stress-Vagina Connection", h: "El Estres Te Descompensa Ahi Abajo Tambien.", c: "El cortisol afecta la flora vaginal. Mensaje que conecta profundamente.", f: "Estatico infografico o reel educativo corto" },
+        ];
+        const acw = [1500, 7300];
+        angles.forEach((ang, i) => {
+          allChildren.push(new Table({ width: { size: acw[0] + acw[1], type: WidthType.DXA }, columnWidths: acw,
+            rows: [
+              new TableRow({ children: [new TableCell({ borders, columnSpan: 2, width: { size: acw[0] + acw[1], type: WidthType.DXA }, shading: { fill: ORANGE, type: ShadingType.CLEAR }, margins: cm, children: [new Paragraph({ children: [new TextRun({ text: `${i + 1}. ${ang.t}`, bold: true, size: 20, color: "FFFFFF", font: "Calibri" })] })] })] }),
+              new TableRow({ children: [dCell("Headline:", acw[0], { bg: LIGHT_GRAY }), new TableCell({ borders, width: { size: acw[1], type: WidthType.DXA }, margins: cm, children: [new Paragraph({ children: [new TextRun({ text: ang.h, size: 20, color: ORANGE, font: "Calibri", bold: true })] })] })] }),
+              new TableRow({ children: [dCell("Concepto:", acw[0], { bg: LIGHT_GRAY }), dCell(ang.c, acw[1])] }),
+              new TableRow({ children: [dCell("Formato:", acw[0], { bg: LIGHT_GRAY }), dCell(ang.f, acw[1])] }),
+            ]
+          }));
+          allChildren.push(new Paragraph({ text: "" }));
+        });
+
+        // Section 5: Execution Plan
+        allChildren.push(new Paragraph({ spacing: { before: 300, after: 150 }, children: [new TextRun({ text: "5. Plan de Ejecucion Recomendado", bold: true, size: 28, color: ORANGE, font: "Calibri" })] }));
+        allChildren.push(new Paragraph({ spacing: { before: 100, after: 60 }, children: [new TextRun({ text: "Semana 1-2: Quick Wins", bold: true, size: 22, color: DARK, font: "Calibri" })] }));
+        allChildren.push(new Paragraph({ children: [new TextRun({ text: "Producir las adaptaciones directas. Son ads probados por la competencia, bajo riesgo.", size: 20, color: DARK, font: "Calibri" })] }));
+        allChildren.push(new Paragraph({ spacing: { before: 150, after: 60 }, children: [new TextRun({ text: "Semana 3-4: Diferenciacion", bold: true, size: 22, color: DARK, font: "Calibri" })] }));
+        allChildren.push(new Paragraph({ children: [new TextRun({ text: "Producir los angulos nuevos originales. Mayor riesgo pero mayor potencial de escala.", size: 20, color: DARK, font: "Calibri" })] }));
+        allChildren.push(new Paragraph({ spacing: { before: 150, after: 60 }, children: [new TextRun({ text: "Semana 5+: Iteracion", bold: true, size: 22, color: DARK, font: "Calibri" })] }));
+        allChildren.push(new Paragraph({ children: [new TextRun({ text: "Analizar resultados, escalar winners, matar losers. El sistema AdSpy seguira detectando ads nuevos.", size: 20, color: DARK, font: "Calibri" })] }));
+      }
+
+      const doc = new Document({
+        styles: { default: { document: { run: { font: "Calibri", size: 20 } } } },
+        sections: [{
+          properties: { page: { size: { width: 12240, height: 15840 }, margin: { top: 1200, right: 1200, bottom: 1200, left: 1200 } } },
+          headers: { default: new Header({ children: [new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: `CELLU+ AdSpy | ${isCreative ? "Brief Creativo" : "Analisis Estrategico"}`, size: 16, color: GRAY, font: "Calibri" })] })] }) },
+          footers: { default: new Footer({ children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Pagina ", size: 16, color: GRAY, font: "Calibri" }), new TextRun({ children: [PageNumber.CURRENT], size: 16, color: GRAY, font: "Calibri" })] })] }) },
+          children: allChildren,
+        }],
+      });
+
+      const blob = await Packer.toBlob(doc);
+      return { blob, fileName };
+    }
+
+    function triggerDownload(blob, fileName) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+    }
+
+    /* âââââââââââ ESTILOS & ANIMACIONES âââââââââââ */
+    const styleSheet = `
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+      :root {
+        --color-primary: #f97316;
+        --color-accent: #06b6d4;
+        --animation-duration: 300ms;
+        --animation-ease: cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      * {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(16px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes scaleIn {
+        from {
+          opacity: 0;
+          transform: scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      @keyframes pulse-glow {
+        0%, 100% {
+          box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4);
+        }
+        50% {
+          box-shadow: 0 0 0 8px rgba(249, 115, 22, 0);
+        }
+      }
+
+      @keyframes shimmer {
+        0% {
+          background-position: -1000px 0;
+        }
+        100% {
+          background-position: 1000px 0;
+        }
+      }
+
+      @keyframes countUp {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideInLeft {
+        from {
+          opacity: 0;
+          transform: translateX(-12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .fade-in { animation: fadeIn 400ms var(--animation-ease) forwards; }
+      .slide-up { animation: slideUp 500ms var(--animation-ease) forwards; }
+      .scale-in { animation: scaleIn 300ms var(--animation-ease) forwards; }
+      .pulse-glow { animation: pulse-glow 2s infinite; }
+      .shimmer { animation: shimmer 2s infinite; background-size: 1000px 100%; }
+
+      .glass-effect {
+        background: rgba(17, 24, 39, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .gradient-text {
+        background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .gradient-bg {
+        background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
+      }
+
+      .btn-primary {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn-primary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 500ms;
+      }
+
+      .btn-primary:hover::before {
+        left: 100%;
+      }
+
+      .stat-card {
+        transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 25px -5px rgba(249, 115, 22, 0.1);
+      }
+
+      .table-row-hover {
+        transition: all 200ms ease;
+      }
+
+      .table-row-hover:hover {
+        background-color: rgba(249, 115, 22, 0.03);
+      }
+
+      .floating-action {
+        animation: slideInLeft 300ms var(--animation-ease);
+      }
+
+      input::-webkit-outer-spin-button,
+      input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+
+      input[type=number] {
+        -moz-appearance: textfield;
+      }
+    `;
+
+    /* âââââââââ DATOS INICIALES âââââââââ */
+    const INITIAL_PRODUCTS = [
+      {
+        id: "cellu-probiotico",
+        name: "CELLU+ Probiotico Vaginal",
+        landing: "https://cellu-arg.com/products/probioticos",
+        contextFiles: [
+          { name: "Avatar_CELLU_Probiotico_Vaginal.docx", type: "file" },
+          { name: "Cadena_de_Creencias_CELLU.docx", type: "file" },
+          { name: "Offer_Brief_CELLU_Probiotico_Vaginal.docx", type: "file" },
+          { name: "GOMITAS CELLU+ Foundational Docs SOP.docx", type: "file" },
+          { name: "https://cellu-arg.com", type: "link" }
+        ],
+        competitors: [
+          { name: "O Positiv", query: "opositivhealth" },
+          { name: "TryHer (HER+)", query: "tryher.com" },
+          { name: "Betadine", query: "betadine" }
+        ],
+        driveFolder: "https://drive.google.com/drive/folders/1GEHkq4pl1o6dmqsEDBGKTtZtGXOs-Cpu",
+        reports: [
+          {
+            date: "2026-04-08",
+            newAds: 10,
+            fileName: "CELLU_Adaptacion_Creativa_2026-04-08.pdf",
+            reportType: "AdaptaciÃ³n Creativa",
+            driveLink: "https://drive.google.com/drive/folders/1GEHkq4pl1o6dmqsEDBGKTtZtGXOs-Cpu",
+            ads: [
+              { id: "ad1", brand: "O Positiv", angle: "Sexualidad + Transformacion", headline: "Sentite Vos de Nuevo.", days: 223, status: "winner", priority: "ALTA", briefed: true, sentiment: "positive" },
+              { id: "ad2", brand: "O Positiv", angle: "Rutina + Pareja", headline: "Sin Olor. Sin Verguenza.", days: 118, status: "strong", priority: "ALTA", briefed: true, sentiment: "positive" },
+              { id: "ad3", brand: "O Positiv", angle: "Curiosidad + Sorpresa", headline: "Una Capsula Puede Cambiar Tu Vida?", days: 111, status: "strong", priority: "MEDIA", briefed: true, sentiment: "positive" },
+              { id: "ad4", brand: "O Positiv", angle: "Testimonial UGC", headline: "Ojala Lo Hubiera Encontrado Antes", days: 217, status: "winner", priority: "ALTA", briefed: true, sentiment: "positive" },
+              { id: "ad5", brand: "O Positiv", angle: "Anti-Antibioticos", headline: "El Antibiotico Es El Problema.", days: 175, status: "strong", priority: "ALTA", briefed: true, sentiment: "negative" },
+              { id: "ad6", brand: "TryHer", angle: "Validacion de Pareja", headline: "Mi Novio Esta Obsesionado", days: 50, status: "testing", priority: "ALTA", briefed: true, sentiment: "positive" },
+              { id: "ad7", brand: "TryHer", angle: "Frustracion + Descubrimiento", headline: "Probe De Todo. Nada Me Duro.", days: 48, status: "testing", priority: "MEDIA", briefed: true, sentiment: "negative" },
+              { id: "ad8", brand: "Betadine", angle: "Rutina Diaria", headline: "Tu Vida No Para.", days: 129, status: "strong", priority: "MEDIA", briefed: true, sentiment: "positive" },
+              { id: "ad9", brand: "Betadine", angle: "Momento del Periodo", headline: "En Esos Dias, Necesitas Refuerzo.", days: 118, status: "strong", priority: "MEDIA", briefed: true, sentiment: "positive" },
+              { id: "ad10", brand: "O Positiv", angle: "Autoridad #1", headline: "El Probiotico #1 de Argentina", days: 75, status: "strong", priority: "MEDIA", briefed: true, sentiment: "positive" },
+            ]
+          }
+        ]
+      }
+    ];
+
+    const EMPTY_PRODUCT = { id: "", name: "", landing: "", contextFiles: [], competitors: [], driveFolder: "", reports: [] };
+
+    const GENERATE_STEPS = [
+      { key: "context", label: "Analizando archivos de contexto...", duration: 1800 },
+      { key: "scan1", label: "Escaneando Meta Ad Library: O Positiv...", duration: 2200 },
+      { key: "scan2", label: "Escaneando Meta Ad Library: TryHer...", duration: 1600 },
+      { key: "scan3", label: "Escaneando Meta Ad Library: Betadine...", duration: 1400 },
+      { key: "filter", label: "Filtrando ads nuevos (3+ dias activos)...", duration: 1000 },
+      { key: "adapt", label: "Adaptando copy a espanol argentino...", duration: 2000 },
+      { key: "docx", label: "Generando brief DOCX...", duration: 1500 },
+      { key: "upload", label: "Subiendo a Google Drive...", duration: 1200 },
+    ];
+
+    /* âââââââââ COMPONENTES AUXILIARES âââââââââ */
+    function Badge({ children, color, variant = "solid" }) {
+      const colors = {
+        green: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+        orange: "bg-orange-500/10 text-orange-400 border-orange-500/20",
+        red: "bg-red-500/10 text-red-400 border-red-500/20",
+        gray: "bg-gray-500/10 text-gray-400 border-gray-500/20",
+        purple: "bg-purple-500/10 text-purple-400 border-purple-500/20",
+        cyan: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
+      };
+      return (
+        <span className={`text-xs px-2.5 py-1 rounded-full border font-medium transition-all ${colors[color] || colors.gray}`}>
+          {children}
+        </span>
+      );
+    }
+
+    function StatusDot({ status }) {
+      const c = status === "winner" ? "bg-emerald-400" : status === "strong" ? "bg-amber-400" : "bg-purple-400";
+      return <span className={`w-2.5 h-2.5 rounded-full ${c} inline-block shadow-lg shadow-${c}/50`} />;
+    }
+
+    function SentimentIcon({ sentiment }) {
+      if (sentiment === "positive") {
+        return <ThumbsUp className="w-3.5 h-3.5 text-emerald-400" />;
+      }
+      if (sentiment === "negative") {
+        return <ThumbsDown className="w-3.5 h-3.5 text-red-400" />;
+      }
+      return null;
+    }
+
+    function FileIcon({ name }) {
+      const ext = name.split(".").pop()?.toLowerCase();
+      if (["pdf"].includes(ext)) return <FileText className="w-3.5 h-3.5 text-red-400" />;
+      if (["png", "jpg", "jpeg", "webp", "svg"].includes(ext)) return <Image className="w-3.5 h-3.5 text-blue-400" />;
+      if (["xlsx", "csv"].includes(ext)) return <FileSpreadsheet className="w-3.5 h-3.5 text-green-400" />;
+      if (name.startsWith("http")) return <Link className="w-3.5 h-3.5 text-orange-400" />;
+      return <File className="w-3.5 h-3.5 text-gray-400" />;
+    }
+
+    function AnimatedCounter({ value = 0, duration = 600 }) {
+      const [displayValue, setDisplayValue] = useState(0);
+
+      useEffect(() => {
+        let startTime = null;
+        const animate = (currentTime) => {
+          if (!startTime) startTime = currentTime;
+          const elapsed = currentTime - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          setDisplayValue(Math.floor(value * progress));
+          if (progress < 1) {
+            requestAnimationFrame(animate);
+          }
+        };
+        requestAnimationFrame(animate);
+      }, [value, duration]);
+
+      return <span>{displayValue}</span>;
+    }
+
+    function Tooltip({ text, children }) {
+      const [show, setShow] = useState(false);
+      return (
+        <div className="relative inline-block group">
+          {children}
+          {show && text && (
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-950 border border-gray-700 rounded text-xs text-gray-300 whitespace-nowrap z-50 animate-fadeIn">
+              {text}
+            </div>
+          )}
+          <div onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)} className="absolute inset-0" />
+        </div>
+      );
+    }
+
+    /* âââââââââ TOAST DE PROGRESO âââââââââ */
+    function ProgressToast({ open, steps, currentStep, done, summary, onClose, onRedownload }) {
+      const [minimized, setMinimized] = useState(false);
+      if (!open) return null;
+
+      const pct = done ? 100 : Math.round((currentStep / steps.length) * 100);
+      const currentLabel = done ? "Brief generado" : steps[currentStep]?.label || "Procesando...";
+
+      if (minimized) {
+        return (
+          <div className="fixed bottom-4 right-4 z-50 w-80 animate-slideUp">
+            <div className="glass-effect rounded-xl shadow-2xl overflow-hidden cursor-pointer hover:shadow-orange-500/20 transition-shadow"
+              onClick={() => setMinimized(false)}>
+              <div className="px-4 py-3 flex items-center gap-3">
+                {done
+                  ? <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                  : <Loader2 className="w-4 h-4 text-orange-400 animate-spin flex-shrink-0" />}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-medium text-gray-300 truncate">{done ? "Brief listo" : "Generando brief..."}</span>
+                    <span className="text-xs text-gray-500 ml-2 font-medium">{pct}%</span>
+                  </div>
+                  <div className="h-1.5 bg-gray-800/50 rounded-full overflow-hidden">
+                    <div className="h-full gradient-bg rounded-full transition-all duration-500"
+                      style={{ width: `${pct}%` }} />
+                  </div>
+                </div>
+                {done && (
+                  <button onClick={e => { e.stopPropagation(); onClose(); }}
+                    className="text-gray-500 hover:text-gray-300 flex-shrink-0 ml-2 transition-colors"><X className="w-4 h-4" /></button>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div className="fixed bottom-4 right-4 z-50 w-96 animate-slideUp">
+          <div className="glass-effect rounded-2xl shadow-2xl overflow-hidden border border-gray-700/50">
+            {/* Header */}
+            <div className="px-5 py-4 border-b border-gray-700/30 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                {done
+                  ? <CheckCircle className="w-5 h-5 text-emerald-400" />
+                  : <Loader2 className="w-5 h-5 text-orange-400 animate-spin" />}
+                <span className="text-sm font-semibold text-gray-100">
+                  {done ? "Brief generado con Ã©xito" : "Generando brief..."}
+                </span>
+              </div>
+              <div className="flex items-center gap-1">
+                <button onClick={() => setMinimized(true)}
+                  className="text-gray-500 hover:text-gray-300 p-1.5 rounded hover:bg-gray-800/50 transition-all">
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+                {done && (
+                  <button onClick={onClose}
+                    className="text-gray-500 hover:text-gray-300 p-1.5 rounded hover:bg-gray-800/50 transition-all">
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Steps */}
+            <div className="px-5 py-4 space-y-2 max-h-56 overflow-y-auto">
+              {steps.map((s, i) => {
+                const isDone = i < currentStep;
+                const isCurrent = i === currentStep && !done;
+                const isPending = i > currentStep && !done;
+                return (
+                  <div key={s.key} className={`flex items-center gap-3 py-1 transition-all ${isPending ? "opacity-40" : "opacity-100"}`} style={{ animation: `fadeIn 300ms ease ${i * 50}ms both` }}>
+                    <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
+                      {isDone || done
+                        ? <CheckCircle className="w-4 h-4 text-emerald-400" />
+                        : isCurrent
+                          ? <Loader2 className="w-4 h-4 text-orange-400 animate-spin" />
+                          : <div className="w-2 h-2 rounded-full bg-gray-600" />}
+                    </div>
+                    <span className={`text-xs font-medium ${isDone || done ? "text-gray-500" : isCurrent ? "text-orange-300" : "text-gray-600"}`}>
+                      {s.label}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Progress bar */}
+            <div className="px-5 py-3 border-t border-gray-700/30">
+              <div className="h-2 bg-gray-800/50 rounded-full overflow-hidden">
+                <div className="h-full gradient-bg rounded-full transition-all duration-700"
+                  style={{ width: `${pct}%` }} />
+              </div>
+            </div>
+
+            {/* Summary */}
+            {done && summary && (
+              <div className="px-5 py-4 border-t border-gray-700/30 space-y-3">
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="bg-gray-800/40 rounded-lg px-3 py-2.5 text-center hover:bg-gray-800/60 transition-colors">
+                    <div className="text-base font-bold text-orange-400"><AnimatedCounter value={summary.totalAds} /></div>
+                    <div className="text-xs text-gray-500 mt-1">Ads</div>
+                  </div>
+                  <div className="bg-gray-800/40 rounded-lg px-3 py-2.5 text-center hover:bg-gray-800/60 transition-colors">
+                    <div className="text-base font-bold text-emerald-400"><AnimatedCounter value={summary.winners} /></div>
+                    <div className="text-xs text-gray-500 mt-1">Winners</div>
+                  </div>
+                  <div className="bg-gray-800/40 rounded-lg px-3 py-2.5 text-center hover:bg-gray-800/60 transition-colors">
+                    <div className="text-base font-bold text-red-400"><AnimatedCounter value={summary.highPriority} /></div>
+                    <div className="text-xs text-gray-500 mt-1">Alta prior.</div>
+                  </div>
+                </div>
+                <div className="bg-gray-800/40 rounded-lg px-4 py-3 hover:bg-gray-800/60 transition-colors">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <FileText className="w-4 h-4 text-orange-500 flex-shrink-0" />
+                      <div className="min-w-0">
+                        <span className="text-xs font-medium text-gray-200 truncate block">{summary.reportType || "Reporte"}</span>
+                        <span className="text-xs text-gray-500 truncate block">{summary.fileName}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 mt-2">
+                    <CheckCircle className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                    <span className="text-xs text-emerald-400 font-medium">Descargado automÃ¡ticamente</span>
+                    {summary.downloadFiles && onRedownload && (
+                      <button onClick={() => summary.downloadFiles.forEach(f => onRedownload(f))}
+                        className="text-xs text-orange-400 hover:text-orange-300 flex items-center gap-1 ml-auto font-medium transition-colors">
+                        <Download className="w-3 h-3" /> Re-descargar
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    /* âââââââââ DROP ZONE PARA ARCHIVOS âââââââââ */
+    function FileDropZone({ files, onAdd, onRemove }) {
+      const [dragging, setDragging] = useState(false);
+      const [linkInput, setLinkInput] = useState("");
+      const fileInputRef = useRef(null);
+
+      const handleDrop = useCallback((e) => {
+        e.preventDefault();
+        setDragging(false);
+        const dropped = Array.from(e.dataTransfer.files);
+        dropped.forEach(f => onAdd({ name: f.name, type: "file", size: f.size }));
+      }, [onAdd]);
+
+      const handleFileSelect = useCallback((e) => {
+        const selected = Array.from(e.target.files);
+        selected.forEach(f => onAdd({ name: f.name, type: "file", size: f.size }));
+        e.target.value = "";
+      }, [onAdd]);
+
+      const addLink = () => {
+        if (!linkInput.trim()) return;
+        onAdd({ name: linkInput.trim(), type: "link" });
+        setLinkInput("");
+      };
+
+      return (
+        <div className="space-y-3">
+          {/* Drop zone */}
+          <div
+            onDragOver={e => { e.preventDefault(); setDragging(true); }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
+            className={`border-2 border-dashed rounded-xl px-5 py-6 text-center cursor-pointer transition-all ${
+              dragging
+                ? "border-orange-500 bg-orange-500/5 scale-102"
+                : "border-gray-700 hover:border-gray-600 bg-gray-800/20 hover:bg-gray-800/40"
+            }`}
+          >
+            <Upload className={`w-7 h-7 mx-auto mb-3 transition-colors ${dragging ? "text-orange-400" : "text-gray-600"}`} />
+            <p className="text-xs text-gray-300">
+              <span className="text-orange-400 font-semibold">Arrastra archivos aquÃ­</span> o hace click
+            </p>
+            <p className="text-xs text-gray-600 mt-1">PDF, DOCX, imÃ¡genes, o cualquier archivo</p>
+            <input ref={fileInputRef} type="file" multiple className="hidden" onChange={handleFileSelect}
+              accept=".pdf,.docx,.doc,.xlsx,.csv,.png,.jpg,.jpeg,.webp,.svg,.txt,.md" />
+          </div>
+
+          {/* Link input */}
+          <div className="flex gap-2">
+            <div className="flex-1 relative">
+              <Link className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+              <input
+                type="text"
+                value={linkInput}
+                onChange={e => setLinkInput(e.target.value)}
+                placeholder="Pega un link (URL, Google Drive, etc.)"
+                className="w-full bg-gray-800 border border-gray-700 rounded-lg pl-9 pr-3 py-2.5 text-xs text-gray-100 placeholder-gray-500 focus:border-orange-500 focus:ring-1 focus:ring-orange-500/30 focus:outline-none transition-all"
+                onKeyDown={e => { if (e.key === "Enter") addLink(); }}
+              />
+            </div>
+            <button onClick={addLink} className="text-xs font-medium text-orange-400 bg-orange-500/10 border border-orange-500/30 px-3.5 py-2.5 rounded-lg hover:bg-orange-500/20 hover:border-orange-500/50 transition-all">
+              <Plus className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* File list */}
+          {files.length > 0 && (
+            <div className="space-y-1.5">
+              {files.map((f, i) => (
+                <div key={i} className="flex items-center justify-between bg-gray-800/40 rounded-lg px-3.5 py-2 group hover:bg-gray-800/60 transition-all" style={{ animation: `fadeIn 300ms ease ${i * 30}ms both` }}>
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <FileIcon name={f.name} />
+                    <span className="text-xs font-medium text-gray-300 truncate">{f.name}</span>
+                    {f.size && <span className="text-xs text-gray-600 flex-shrink-0">({(f.size / 1024).toFixed(0)}KB)</span>}
+                  </div>
+                  <button onClick={() => onRemove(i)}
+                    className="text-gray-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all flex-shrink-0 ml-3 hover:scale-110">
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    /* âââââââââââ APP PRINCIPAL âââââââââââ */
+    function App() {
+      const [products, setProducts] = useState(INITIAL_PRODUCTS);
+      const [selectedId, setSelectedId] = useState(INITIAL_PRODUCTS[0]?.id || null);
+      const [view, setView] = useState("report");
+      const [formMode, setFormMode] = useState(null);
+      const [editProduct, setEditProduct] = useState(null);
+      const [dropdownOpen, setDropdownOpen] = useState(false);
+      const [newCompName, setNewCompName] = useState("");
+      const [newCompQuery, setNewCompQuery] = useState("");
+
+      const [genModal, setGenModal] = useState(false);
+      const [genStep, setGenStep] = useState(0);
+      const [genDone, setGenDone] = useState(false);
+      const [genSummary, setGenSummary] = useState(null);
+      const [genMenuOpen, setGenMenuOpen] = useState(false);
+      const [genType, setGenType] = useState(null);
+
+      const [selectedAds, setSelectedAds] = useState(new Set());
+      const [selectAll, setSelectAll] = useState(false);
+      const [viewingReport, setViewingReport] = useState(null);
+      const [searchFilter, setSearchFilter] = useState("");
+      const [filterBrand, setFilterBrand] = useState("all");
+      const [filterPriority, setFilterPriority] = useState("all");
+      const [lastUpdated, setLastUpdated] = useState(new Date());
+
+      const selected = products.find(p => p.id === selectedId);
+      const latestReport = selected?.reports?.[0];
+      const ep = editProduct || EMPTY_PRODUCT;
+      const setEp = (key, val) => setEditProduct(prev => ({ ...prev, [key]: val }));
+
+      const dynamicSteps = () => {
+        const base = [{ key: "context", label: "Analizando archivos de contexto...", duration: 1800 }];
+        (selected?.competitors || []).forEach(c => {
+          base.push({ key: `scan-${c.query}`, label: `Escaneando Meta Ad Library: ${c.name}...`, duration: 1200 + Math.random() * 1000 });
+        });
+        base.push({ key: "filter", label: "Filtrando ads nuevos (3+ dÃ­as activos)...", duration: 1000 });
+        base.push({ key: "adapt", label: "Adaptando Ã¡ngulos y estÃ©tica a CELLU+...", duration: 2200 });
+        base.push({ key: "brief", label: "Generando reporte DOCX...", duration: 1800 });
+        base.push({ key: "download", label: "Preparando descarga...", duration: 800 });
+        return base;
+      };
+
+      const filteredAds = useMemo(() => {
+        if (!latestReport) return [];
+        return latestReport.ads.filter(ad => {
+          const matchesSearch = !searchFilter ||
+            ad.headline.toLowerCase().includes(searchFilter.toLowerCase()) ||
+            ad.angle.toLowerCase().includes(searchFilter.toLowerCase());
+          const matchesBrand = filterBrand === "all" || ad.brand === filterBrand;
+          const matchesPriority = filterPriority === "all" || ad.priority === filterPriority;
+          return matchesSearch && matchesBrand && matchesPriority;
+        });
+      }, [latestReport, searchFilter, filterBrand, filterPriority]);
+
+      const hasUnprocessedAds = useMemo(() => {
+        if (!latestReport) return false;
+        return latestReport.ads.some(ad => !ad.briefed);
+      }, [latestReport]);
+
+      const openNew = () => { setEditProduct({ ...EMPTY_PRODUCT, id: `p-${Date.now()}` }); setFormMode("new"); setView("form"); };
+      const openEdit = () => { setEditProduct({ ...selected, competitors: [...selected.competitors], contextFiles: [...selected.contextFiles] }); setFormMode("edit"); setView("form"); };
+      const cancel = () => { setView("report"); setEditProduct(null); setFormMode(null); };
+
+      const save = () => {
+        if (formMode === "new") { setProducts(prev => [...prev, editProduct]); setSelectedId(editProduct.id); }
+        else { setProducts(prev => prev.map(p => p.id === editProduct.id ? editProduct : p)); }
+        setView("report"); setEditProduct(null); setFormMode(null);
+      };
+
+      const remove = () => {
+        const remaining = products.filter(p => p.id !== editProduct.id);
+        setProducts(remaining);
+        setSelectedId(remaining[0]?.id || null);
+        setView("report"); setEditProduct(null); setFormMode(null);
+      };
+
+      const addComp = () => {
+        if (!newCompName || !newCompQuery) return;
+        setEp("competitors", [...ep.competitors, { name: newCompName, query: newCompQuery }]);
+        setNewCompName(""); setNewCompQuery("");
+      };
+
+      const toggleAd = (id) => {
+        setSelectedAds(prev => {
+          const next = new Set(prev);
+          if (next.has(id)) next.delete(id); else next.add(id);
+          return next;
+        });
+      };
+
+      const toggleAll = () => {
+        if (selectAll) { setSelectedAds(new Set()); setSelectAll(false); }
+        else {
+          const allIds = new Set(filteredAds.map(a => a.id) || []);
+          setSelectedAds(allIds);
+          setSelectAll(true);
+        }
+      };
+
+      // Store generated blobs for re-download
+      const generatedFiles = useRef({});
+
+      const downloadReport = useCallback((fileName) => {
+        const blob = generatedFiles.current[fileName];
+        if (blob) triggerDownload(blob, fileName);
+      }, []);
+
+      const startGenerate = (type = "both") => {
+        const steps = dynamicSteps();
+        setGenModal(true);
+        setGenStep(0);
+        setGenDone(false);
+        setGenSummary(null);
+
+        let step = 0;
+        const advance = () => {
+          step++;
+          setGenStep(step);
+          if (step < steps.length) {
+            setTimeout(advance, steps[step].duration);
+          } else {
+            const adsInBrief = selectedAds.size > 0
+              ? latestReport?.ads.filter(a => selectedAds.has(a.id)) || []
+              : latestReport?.ads || [];
+            const today = new Date().toISOString().slice(0, 10);
+            const typeLabels = { creative: "AdaptaciÃ³n Creativa", strategic: "AnÃ¡lisis EstratÃ©gico", both: "AdaptaciÃ³n + AnÃ¡lisis" };
+
+            // === GENERATE REAL DOCX FILES ===
+            (async () => {
+              try {
+                const generated = [];
+
+                if (type === "creative" || type === "both") {
+                  const { blob, fileName } = await buildDocxBlob("creative", selected.name, adsInBrief, selected.competitors, selected.contextFiles);
+                  generatedFiles.current[fileName] = blob;
+                  generated.push({ blob, fileName, reportType: "AdaptaciÃ³n Creativa" });
+                  triggerDownload(blob, fileName);
+                }
+
+                if (type === "strategic" || type === "both") {
+                  const { blob, fileName } = await buildDocxBlob("strategic", selected.name, adsInBrief, selected.competitors, selected.contextFiles);
+                  generatedFiles.current[fileName] = blob;
+                  generated.push({ blob, fileName, reportType: "AnÃ¡lisis EstratÃ©gico" });
+                  if (type === "both") {
+                    setTimeout(() => triggerDownload(blob, fileName), 500);
+                  } else {
+                    triggerDownload(blob, fileName);
+                  }
+                }
+
+                const allFileNames = generated.map(g => g.fileName).join(" + ");
+                const summary = {
+                  totalAds: adsInBrief.length,
+                  winners: adsInBrief.filter(a => a.status === "winner").length,
+                  highPriority: adsInBrief.filter(a => a.priority === "ALTA").length,
+                  fileName: allFileNames,
+                  reportType: typeLabels[type] || typeLabels.both,
+                  downloadFiles: generated.map(g => g.fileName),
+                };
+                setGenSummary(summary);
+                setGenDone(true);
+
+                const makeReport = (name, rType) => ({
+                  date: today,
+                  newAds: adsInBrief.length,
+                  fileName: name,
+                  reportType: rType,
+                  downloadable: true,
+                  ads: adsInBrief.map(a => ({ ...a, briefed: true })),
+                });
+
+                const newReports = [];
+                generated.forEach(g => {
+                  newReports.push(makeReport(g.fileName, g.reportType));
+                });
+
+                setProducts(prev => prev.map(p =>
+                  p.id === selectedId
+                    ? { ...p, reports: [...newReports, ...p.reports] }
+                    : p
+                ));
+                setSelectedAds(new Set());
+                setSelectAll(false);
+                setLastUpdated(new Date());
+              } catch (err) {
+                console.error("Error generating DOCX:", err);
+                setGenSummary({ totalAds: 0, winners: 0, highPriority: 0, fileName: "Error al generar", reportType: "Error", downloadFiles: [] });
+                setGenDone(true);
+              }
+            })();
+          }
+        };
+        setTimeout(advance, steps[0].duration);
+      };
+
+      const closeGenModal = () => { setGenModal(false); };
+
+      const inputCls = "w-full bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-2.5 text-sm text-gray-100 placeholder-gray-500 focus:border-orange-500 focus:ring-1 focus:ring-orange-500/30 focus:outline-none transition-all";
+      const inputSmCls = "flex-1 bg-gray-800/50 border border-gray-700 rounded-lg px-3 py-2 text-xs text-gray-100 placeholder-gray-500 focus:border-orange-500 focus:outline-none transition-all";
+
+      const timeAgo = (date) => {
+        const now = new Date();
+        const diff = now - date;
+        const minutes = Math.floor(diff / 60000);
+        if (minutes < 1) return "Justo ahora";
+        if (minutes < 60) return `Hace ${minutes}m`;
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return `Hace ${hours}h`;
+        const days = Math.floor(hours / 24);
+        return `Hace ${days}d`;
+      };
+
+      return (
+        <>
+          <style>{styleSheet}</style>
+          <div className="min-h-screen bg-gradient-to-br from-gray-950 via-slate-950 to-gray-950 text-gray-100">
+
+            {/* ===== TOAST DE PROGRESO ===== */}
+            <ProgressToast
+              open={genModal}
+              steps={dynamicSteps()}
+              currentStep={genStep}
+              done={genDone}
+              summary={genSummary}
+              onClose={closeGenModal}
+              onRedownload={downloadReport}
+            />
+
+            {/* ===== BARRA SUPERIOR ===== */}
+            <div className="glass-effect sticky top-0 z-40 border-b border-gray-700/30">
+              <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
+
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center">
+                      <Zap className="w-5 h-5 text-white font-bold" />
+                    </div>
+                    <span className="text-sm font-bold gradient-text">AdSpy</span>
+                  </div>
+                  <div className="w-px h-6 bg-gray-700/50" />
+
+                  {/* Selector de producto */}
+                  <div className="relative">
+                    <button onClick={() => setDropdownOpen(!dropdownOpen)}
+                      className="flex items-center gap-2.5 bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-2 text-sm text-gray-200 hover:border-gray-600 hover:bg-gray-800 transition-all min-w-52">
+                      <Package className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                      <span className="truncate">{selected ? selected.name : "Selecciona producto"}</span>
+                      <ChevronDown className="w-4 h-4 text-gray-500 ml-auto flex-shrink-0" />
+                    </button>
+
+                    {dropdownOpen && (
+                      <div className="absolute top-full left-0 mt-2 w-72 glass-effect rounded-xl shadow-2xl overflow-hidden z-30 border border-gray-700/50 animate-slideUp">
+                        {products.map((p, idx) => (
+                          <button key={p.id}
+                            onClick={() => { setSelectedId(p.id); setDropdownOpen(false); setView("report"); }}
+                            className={`w-full flex items-center justify-between px-4 py-3 text-sm hover:bg-gray-800/50 text-left transition-all ${p.id === selectedId ? "bg-orange-500/10 text-orange-400 border-l-2 border-orange-500" : "text-gray-300 border-l-2 border-transparent"}`}
+                            style={{ animation: `fadeIn 200ms ease ${idx * 40}ms both` }}>
+                            <span className="truncate font-medium">{p.name}</span>
+                            {p.reports.length > 0 && <span className="text-xs text-gray-500">{p.reports[0].ads.length} ads</span>}
+                          </button>
+                        ))}
+                        <div className="border-t border-gray-700/30">
+                          <button onClick={() => { openNew(); setDropdownOpen(false); }}
+                            className="w-full flex items-center gap-2 px-4 py-3 text-sm text-orange-400 hover:bg-gray-800/50 font-medium transition-all">
+                            <Plus className="w-4 h-4" /> Nuevo producto
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Acciones top bar */}
+                <div className="flex items-center gap-3">
+                  {view === "report" && selected && (
+                    <>
+                      <button onClick={openEdit}
+                        className="flex items-center gap-2 text-xs font-medium text-gray-400 hover:text-gray-200 px-3 py-2 rounded-lg hover:bg-gray-800/50 transition-all">
+                        <Settings className="w-4 h-4" /> Config
+                      </button>
+                      <div className="relative">
+                        <button onClick={() => setGenMenuOpen(!genMenuOpen)} disabled={genModal}
+                          className="btn-primary flex items-center gap-2 text-xs font-semibold text-white bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 disabled:from-orange-800 disabled:to-orange-800 disabled:text-orange-300 px-4 py-2 rounded-lg transition-all shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 hover:-translate-y-0.5">
+                          <Play className="w-4 h-4" />
+                          {selectedAds.size > 0 ? `Generar (${selectedAds.size})` : "Generar"}
+                          <ChevronDown className="w-3.5 h-3.5 ml-1" />
+                          {hasUnprocessedAds && !selectedAds.size && <Bell className="w-2.5 h-2.5 absolute -top-1 -right-1 text-red-400 animate-pulse" />}
+                        </button>
+                        {genMenuOpen && (
+                          <div className="absolute top-full right-0 mt-2 w-72 glass-effect rounded-xl shadow-2xl overflow-hidden z-30 border border-gray-700/50 animate-slideUp">
+                            <button onClick={() => { setGenType("creative"); startGenerate("creative"); setGenMenuOpen(false); }}
+                              className="w-full text-left px-4 py-3 hover:bg-gray-800/50 transition-all border-b border-gray-700/30">
+                              <div className="text-sm font-medium text-gray-200">Brief de AdaptaciÃ³n Creativa</div>
+                              <div className="text-xs text-gray-500 mt-1">Adapta Ã¡ngulos y estÃ©tica de competidores a tu marca CELLU+</div>
+                            </button>
+                            <button onClick={() => { setGenType("strategic"); startGenerate("strategic"); setGenMenuOpen(false); }}
+                              className="w-full text-left px-4 py-3 hover:bg-gray-800/50 transition-all border-b border-gray-700/30">
+                              <div className="text-sm font-medium text-gray-200">AnÃ¡lisis EstratÃ©gico</div>
+                              <div className="text-xs text-gray-500 mt-1">HipÃ³tesis, patrones y nuevos Ã¡ngulos</div>
+                            </button>
+                            <button onClick={() => { setGenType("both"); startGenerate("both"); setGenMenuOpen(false); }}
+                              className="w-full text-left px-4 py-3 hover:bg-gray-800/50 transition-all">
+                              <div className="text-sm font-medium text-orange-400">Ambos Reportes</div>
+                              <div className="text-xs text-gray-500 mt-1">AdaptaciÃ³n creativa + anÃ¡lisis estratÃ©gico</div>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
+                  {view === "form" && (
+                    <>
+                      <button onClick={cancel}
+                        className="flex items-center gap-1.5 text-xs font-medium text-gray-400 hover:text-gray-200 px-3 py-2 rounded-lg hover:bg-gray-800/50 transition-all">
+                        <ArrowLeft className="w-4 h-4" /> Volver
+                      </button>
+                      <button onClick={save}
+                        className="btn-primary flex items-center gap-2 text-xs font-semibold text-white bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 px-4 py-2 rounded-lg transition-all shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50">
+                        <Check className="w-4 h-4" /> Guardar
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* ===== CONTENIDO ===== */}
+            <div className="max-w-5xl mx-auto px-6 py-6">
+
+              {/* ââââââââ VISTA REPORTE ââââââââ */}
+              {view === "report" && selected && (
+                <div className="space-y-6 animate-fadeIn">
+
+                  {/* Header del producto */}
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h1 className="text-2xl font-bold text-gray-100 mb-3">{selected.name}</h1>
+                      <div className="flex items-center gap-4 flex-wrap">
+                        <a href={selected.landing} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-orange-400 hover:text-orange-300 flex items-center gap-1.5 transition-colors">
+                          <ExternalLink className="w-3.5 h-3.5" /> Landing
+                        </a>
+                        <div className="w-px h-4 bg-gray-700/50" />
+                        <span className="text-xs font-medium text-gray-500">
+                          <TrendingUp className="w-3.5 h-3.5 inline mr-1" />
+                          {selected.competitors.length} competidores
+                        </span>
+                        <span className="text-xs font-medium text-gray-500">
+                          <Upload className="w-3.5 h-3.5 inline mr-1" />
+                          {selected.contextFiles.length} archivos
+                        </span>
+                        {selected.driveFolder && (
+                          <a href={selected.driveFolder} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-cyan-400 hover:text-cyan-300 flex items-center gap-1.5 transition-colors">
+                            <FolderOpen className="w-3.5 h-3.5" /> Drive
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                    {lastUpdated && (
+                      <div className="text-right">
+                        <div className="text-xs text-gray-600 flex items-center gap-1.5">
+                          <Clock className="w-3.5 h-3.5" />
+                          {timeAgo(lastUpdated)}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Stats Cards */}
+                  {latestReport && (
+                    <div className="grid grid-cols-4 gap-3">
+                      {[
+                        { label: "Total ads", value: latestReport.ads.length, icon: Package, color: "text-gray-100", bg: "from-gray-700/20 to-gray-700/10" },
+                        { label: "Winners", value: latestReport.ads.filter(a => a.status === "winner").length, icon: TrendingUp, color: "text-emerald-400", bg: "from-emerald-700/20 to-emerald-700/10" },
+                        { label: "Alta prioridad", value: latestReport.ads.filter(a => a.priority === "ALTA").length, icon: AlertCircle, color: "text-red-400", bg: "from-red-700/20 to-red-700/10" },
+                        { label: "Procesados", value: latestReport.ads.filter(a => a.briefed).length, icon: CheckCircle, color: "text-blue-400", bg: "from-blue-700/20 to-blue-700/10" },
+                      ].map((s, idx) => {
+                        const Icon = s.icon;
+                        return (
+                          <div key={s.label} className={`stat-card bg-gradient-to-br ${s.bg} rounded-xl border border-gray-700/30 px-4 py-4 hover:border-gray-600/50 group`} style={{ animation: `slideUp 400ms ease ${idx * 80}ms both` }}>
+                            <div className="flex items-center justify-between mb-2">
+                              <div className={`text-2xl font-bold ${s.color}`}>
+                                <AnimatedCounter value={s.value} duration={800} />
+                              </div>
+                              <Icon className={`w-5 h-5 ${s.color} opacity-50 group-hover:opacity-100 transition-opacity`} />
+                            </div>
+                            <div className="text-xs font-medium text-gray-500">{s.label}</div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* Reportes generados */}
+                  {selected.reports.length > 0 && (
+                    <div className="glass-effect rounded-xl border border-gray-700/30 overflow-hidden">
+                      <div className="px-5 py-4 border-b border-gray-700/30">
+                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Reportes generados</h3>
+                      </div>
+                      <div className="divide-y divide-gray-700/20">
+                        {selected.reports.map((r, i) => (
+                          <div key={i} className="px-5 py-4 flex items-center justify-between hover:bg-gray-800/20 transition-all group" style={{ animation: `fadeIn 300ms ease ${i * 100}ms both` }}>
+                            <div className="flex items-center gap-3.5 flex-1">
+                              <div className="w-10 h-10 bg-orange-500/10 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-orange-500/20 transition-colors">
+                                <FileText className="w-5 h-5 text-orange-500" />
+                              </div>
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2.5 mb-1">
+                                  <span className="text-sm font-semibold text-gray-200">{r.fileName}</span>
+                                  {r.reportType && (
+                                    <Badge color={r.reportType.includes("Creativ") ? "orange" : "purple"}>
+                                      {r.reportType.includes("Creativ") ? "AdaptaciÃ³n" : "EstratÃ©gico"}
+                                    </Badge>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-2 text-xs text-gray-500">
+                                  <Clock className="w-3 h-3" />
+                                  {r.date}
+                                  <span className="text-gray-700">Â·</span>
+                                  <Package className="w-3 h-3" />
+                                  {r.newAds} ads
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 flex-shrink-0">
+                              <button onClick={() => setViewingReport(viewingReport === i ? null : i)}
+                                className="flex items-center gap-1 text-xs font-medium text-orange-400 hover:text-orange-300 bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/20 px-3 py-1.5 rounded-lg transition-all">
+                                <Eye className="w-3.5 h-3.5" /> {viewingReport === i ? "Cerrar" : "Ver"}
+                              </button>
+                              {r.downloadable && generatedFiles.current[r.fileName] ? (
+                                <button onClick={() => downloadReport(r.fileName)}
+                                  className="flex items-center gap-1 text-xs font-medium text-emerald-400 hover:text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 px-3 py-1.5 rounded-lg transition-all">
+                                  <Download className="w-3.5 h-3.5" /> Descargar
+                                </button>
+                              ) : r.driveLink ? (
+                                <a href={r.driveLink} target="_blank" rel="noopener noreferrer"
+                                  className="flex items-center gap-1 text-xs font-medium text-cyan-400 hover:text-cyan-300 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/20 px-3 py-1.5 rounded-lg transition-all">
+                                  <FolderOpen className="w-3.5 h-3.5" /> Drive
+                                </a>
+                              ) : null}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Inline report viewer */}
+                      {viewingReport !== null && selected.reports[viewingReport] && (
+                        <div className="border-t border-gray-700/30 bg-gray-950/50 animate-slideUp">
+                          <div className="px-5 py-3 flex items-center justify-between border-b border-gray-700/30 bg-gray-900/30">
+                            <span className="text-xs font-semibold text-gray-400">
+                              Vista previa: {selected.reports[viewingReport].fileName}
+                            </span>
+                            <button onClick={() => setViewingReport(null)} className="text-gray-500 hover:text-gray-300 transition-colors">
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                          <div className="p-4 max-h-96 overflow-y-auto space-y-2.5">
+                            {selected.reports[viewingReport].ads.map((ad, ai) => (
+                              <div key={ai} className="bg-gray-900/50 rounded-lg border border-gray-700/30 p-3.5 hover:border-gray-600/50 transition-all" style={{ animation: `fadeIn 200ms ease ${ai * 30}ms both` }}>
+                                <div className="flex items-start justify-between mb-2">
+                                  <div className="flex items-center gap-2.5 flex-1">
+                                    <StatusDot status={ad.status} />
+                                    <span className="text-xs font-medium text-gray-400">{ad.brand}</span>
+                                    <span className="text-xs text-gray-700">Â·</span>
+                                    <span className="text-xs text-gray-300">{ad.angle}</span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    {ad.sentiment && <SentimentIcon sentiment={ad.sentiment} />}
+                                    <span className="text-xs text-gray-500">{ad.days}d</span>
+                                  </div>
+                                </div>
+                                <div className="text-sm font-semibold text-orange-400">{ad.headline}</div>
+                                <div className="flex items-center gap-2 mt-2 pt-2 border-t border-gray-700/20">
+                                  <Badge color={ad.priority === "ALTA" ? "red" : "orange"}>{ad.priority}</Badge>
+                                  {ad.briefed && <CheckCircle className="w-3 h-3 text-emerald-400" />}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Tabla de ads con filtros */}
+                  {latestReport && (
+                    <div className="glass-effect rounded-xl border border-gray-700/30 overflow-hidden">
+                      <div className="px-5 py-4 border-b border-gray-700/30 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                            Ads detectados ({filteredAds.length} de {latestReport.ads.length})
+                          </h3>
+                          {selectedAds.size > 0 && (
+                            <span className="text-xs font-semibold text-orange-400 bg-orange-500/10 px-2.5 py-1 rounded-full">
+                              {selectedAds.size} seleccionados
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Filtros */}
+                        <div className="grid grid-cols-3 gap-3">
+                          <div className="relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-600" />
+                            <input
+                              type="text"
+                              value={searchFilter}
+                              onChange={e => setSearchFilter(e.target.value)}
+                              placeholder="Buscar por headline o Ã¡ngulo..."
+                              className="w-full bg-gray-800/30 border border-gray-700 rounded-lg pl-9 pr-3 py-2 text-xs text-gray-100 placeholder-gray-600 focus:border-orange-500 focus:ring-1 focus:ring-orange-500/30 focus:outline-none transition-all"
+                            />
+                          </div>
+                          <select
+                            value={filterBrand}
+                            onChange={e => setFilterBrand(e.target.value)}
+                            className="bg-gray-800/30 border border-gray-700 rounded-lg px-3 py-2 text-xs text-gray-100 focus:border-orange-500 focus:ring-1 focus:ring-orange-500/30 focus:outline-none transition-all"
+                          >
+                            <option value="all">Todas las marcas</option>
+                            {[...new Set(latestReport.ads.map(a => a.brand))].map(brand => (
+                              <option key={brand} value={brand}>{brand}</option>
+                            ))}
+                          </select>
+                          <select
+                            value={filterPriority}
+                            onChange={e => setFilterPriority(e.target.value)}
+                            className="bg-gray-800/30 border border-gray-700 rounded-lg px-3 py-2 text-xs text-gray-100 focus:border-orange-500 focus:ring-1 focus:ring-orange-500/30 focus:outline-none transition-all"
+                          >
+                            <option value="all">Todas las prioridades</option>
+                            <option value="ALTA">Alta</option>
+                            <option value="MEDIA">Media</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="text-xs font-semibold text-gray-500 border-b border-gray-700/30 bg-gray-900/40">
+                              <th className="text-center px-4 py-3 w-10">
+                                <input type="checkbox" checked={selectAll}
+                                  onChange={toggleAll}
+                                  className="rounded border-gray-600 bg-gray-800 text-orange-500 focus:ring-orange-500/30 w-4 h-4 cursor-pointer" />
+                              </th>
+                              <th className="text-center px-3 py-3 w-6"></th>
+                              <th className="text-left px-4 py-3">Marca</th>
+                              <th className="text-left px-4 py-3">Ãngulo</th>
+                              <th className="text-left px-4 py-3">Headline adaptado</th>
+                              <th className="text-center px-4 py-3 w-12">DÃ­as</th>
+                              <th className="text-center px-4 py-3 w-16">Prior.</th>
+                              <th className="text-center px-4 py-3 w-10">Sent.</th>
+                              <th className="text-center px-4 py-3 w-8"></th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {filteredAds.map((ad, idx) => (
+                              <tr key={ad.id}
+                                onClick={() => toggleAd(ad.id)}
+                                className={`table-row-hover border-t border-gray-700/20 cursor-pointer transition-all ${
+                                  selectedAds.has(ad.id) ? "bg-orange-500/8" : ""
+                                }`}
+                                style={{ animation: `fadeIn 200ms ease ${idx * 20}ms both` }}>
+                                <td className="text-center px-4 py-3">
+                                  <input type="checkbox" checked={selectedAds.has(ad.id)}
+                                    onChange={() => toggleAd(ad.id)}
+                                    onClick={e => e.stopPropagation()}
+                                    className="rounded border-gray-600 bg-gray-800 text-orange-500 focus:ring-orange-500/30 w-4 h-4 cursor-pointer" />
+                                </td>
+                                <td className="px-3 py-3"><StatusDot status={ad.status} /></td>
+                                <td className="px-4 py-3">
+                                  <span className="text-xs font-semibold text-gray-300">{ad.brand}</span>
+                                </td>
+                                <td className="px-4 py-3">
+                                  <span className="text-xs text-gray-400">{ad.angle}</span>
+                                </td>
+                                <td className="px-4 py-3">
+                                  <Tooltip text={ad.headline}>
+                                    <span className="text-xs font-medium text-orange-400 truncate block">{ad.headline}</span>
+                                  </Tooltip>
+                                </td>
+                                <td className="px-4 py-3 text-center">
+                                  <span className="text-xs font-medium text-gray-500">{ad.days}d</span>
+                                </td>
+                                <td className="px-4 py-3 text-center">
+                                  <Badge color={ad.priority === "ALTA" ? "red" : "orange"}>{ad.priority}</Badge>
+                                </td>
+                                <td className="px-4 py-3 text-center">
+                                  {ad.sentiment && <SentimentIcon sentiment={ad.sentiment} />}
+                                </td>
+                                <td className="px-4 py-3 text-center">
+                                  {ad.briefed ? (
+                                    <CheckCircle className="w-4 h-4 text-emerald-400 mx-auto" />
+                                  ) : (
+                                    <AlertCircle className="w-4 h-4 text-orange-400 mx-auto" />
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {/* Selection action bar */}
+                      {selectedAds.size > 0 && (
+                        <div className="px-5 py-4 border-t border-gray-700/30 bg-gray-800/30 flex items-center justify-between floating-action">
+                          <span className="text-xs font-medium text-gray-400">
+                            {selectedAds.size} {selectedAds.size === 1 ? "ad" : "ads"} seleccionado{selectedAds.size === 1 ? "" : "s"} para el brief
+                          </span>
+                          <div className="relative">
+                            <button onClick={() => setGenMenuOpen(!genMenuOpen)} disabled={genModal}
+                              className="btn-primary flex items-center gap-2 text-xs font-semibold text-white bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 disabled:from-orange-800 disabled:to-orange-800 px-4 py-2 rounded-lg transition-all">
+                              <Play className="w-3.5 h-3.5" /> Generar ({selectedAds.size}) <ChevronDown className="w-3.5 h-3.5" />
+                            </button>
+                            {genMenuOpen && (
+                              <div className="absolute bottom-full right-0 mb-2 w-56 glass-effect rounded-xl shadow-2xl overflow-hidden z-30 border border-gray-700/50 animate-slideUp">
+                                <button onClick={() => { startGenerate("creative"); setGenMenuOpen(false); }}
+                                  className="w-full text-left px-4 py-3 hover:bg-gray-800/50 text-xs font-medium text-gray-200 border-b border-gray-700/30 transition-all">AdaptaciÃ³n Creativa</button>
+                                <button onClick={() => { startGenerate("strategic"); setGenMenuOpen(false); }}
+                                  className="w-full text-left px-4 py-3 hover:bg-gray-800/50 text-xs font-medium text-gray-200 border-b border-gray-700/30 transition-all">AnÃ¡lisis EstratÃ©gico</button>
+                                <button onClick={() => { startGenerate("both"); setGenMenuOpen(false); }}
+                                  className="w-full text-left px-4 py-3 hover:bg-gray-800/50 text-xs font-medium text-orange-400 transition-all">Ambos Reportes</button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* ââââââââ FORMULARIO NUEVO / EDITAR ââââââââ */}
+              {view === "form" && editProduct && (
+                <div className="space-y-5 animate-fadeIn">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-2xl font-bold text-gray-100">
+                      {formMode === "new" ? "Crear nuevo producto" : `Editar: ${ep.name || "Producto"}`}
+                    </h2>
+                    {formMode === "edit" && (
+                      <button onClick={remove}
+                        className="flex items-center gap-2 text-xs font-medium text-red-500/70 hover:text-red-400 px-4 py-2 rounded-lg hover:bg-red-500/5 border border-red-500/20 hover:border-red-500/30 transition-all">
+                        <Trash2 className="w-4 h-4" /> Eliminar
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Datos bÃ¡sicos */}
+                  <div className="glass-effect rounded-xl border border-gray-700/30 p-5 space-y-4">
+                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">InformaciÃ³n bÃ¡sica</h3>
+                    <div>
+                      <label className="text-xs font-medium text-gray-400 block mb-2">Nombre del producto</label>
+                      <input type="text" value={ep.name} onChange={e => setEp("name", e.target.value)}
+                        placeholder="Ej: CELLU+ ProbiÃ³tico Vaginal" className={inputCls} />
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-gray-400 block mb-2">Landing / pÃ¡gina de venta</label>
+                      <input type="text" value={ep.landing} onChange={e => setEp("landing", e.target.value)}
+                        placeholder="https://..." className={inputCls} />
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-gray-400 block mb-2">Carpeta Google Drive</label>
+                      <input type="text" value={ep.driveFolder} onChange={e => setEp("driveFolder", e.target.value)}
+                        placeholder="https://drive.google.com/drive/folders/..." className={inputCls} />
+                    </div>
+                  </div>
+
+                  {/* Archivos de contexto */}
+                  <div className="glass-effect rounded-xl border border-gray-700/30 p-5">
+                    <div className="mb-4">
+                      <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Archivos y links de contexto</h3>
+                      <p className="text-xs text-gray-600 mt-2">SubÃ­ PDFs, documentos, imÃ¡genes o pegÃ¡ links. Todo lo que sirva para entender la marca.</p>
+                    </div>
+                    <FileDropZone
+                      files={ep.contextFiles}
+                      onAdd={(f) => setEp("contextFiles", [...ep.contextFiles, f])}
+                      onRemove={(i) => setEp("contextFiles", ep.contextFiles.filter((_, idx) => idx !== i))}
+                    />
+                  </div>
+
+                  {/* Competidores */}
+                  <div className="glass-effect rounded-xl border border-gray-700/30 p-5">
+                    <div className="mb-4">
+                      <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Competidores a monitorear</h3>
+                      <p className="text-xs text-gray-600 mt-2">Marcas a espiar en Meta Ad Library.</p>
+                    </div>
+                    {ep.competitors.length > 0 && (
+                      <div className="space-y-2 mb-4">
+                        {ep.competitors.map((c, i) => (
+                          <div key={i} className="flex items-center justify-between bg-gray-800/40 rounded-lg px-4 py-3 group hover:bg-gray-800/60 transition-all" style={{ animation: `fadeIn 300ms ease ${i * 50}ms both` }}>
+                            <div className="flex items-center gap-3">
+                              <Search className="w-4 h-4 text-gray-600" />
+                              <span className="text-sm font-medium text-gray-200">{c.name}</span>
+                              <span className="text-xs text-gray-600">Â· {c.query}</span>
+                            </div>
+                            <button onClick={() => setEp("competitors", ep.competitors.filter((_, idx) => idx !== i))}
+                              className="text-gray-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all hover:scale-110">
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <div className="flex gap-2">
+                      <input type="text" value={newCompName} onChange={e => setNewCompName(e.target.value)}
+                        placeholder="Nombre (ej: O Positiv)" className={inputSmCls}
+                        onKeyDown={e => { if (e.key === "Enter" && newCompName && newCompQuery) addComp(); }} />
+                      <input type="text" value={newCompQuery} onChange={e => setNewCompQuery(e.target.value)}
+                        placeholder="Query (ej: opositivhealth)" className={inputSmCls}
+                        onKeyDown={e => { if (e.key === "Enter" && newCompName && newCompQuery) addComp(); }} />
+                      <button onClick={addComp} className="text-xs font-medium text-orange-400 bg-orange-500/10 border border-orange-500/30 px-4 py-2 rounded-lg hover:bg-orange-500/20 hover:border-orange-500/50 transition-all">
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Sin producto */}
+              {!selected && view === "report" && (
+                <div className="flex flex-col items-center justify-center py-24 animate-fadeIn">
+                  <div className="w-16 h-16 bg-orange-500/10 rounded-2xl flex items-center justify-center mb-5">
+                    <Package className="w-8 h-8 text-orange-500/50" />
+                  </div>
+                  <p className="text-gray-500 text-sm mb-6 font-medium">No hay productos cargados</p>
+                  <button onClick={openNew} className="flex items-center gap-2 text-sm font-semibold text-white bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 px-6 py-3 rounded-lg transition-all shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 hover:-translate-y-0.5">
+                    <Plus className="w-5 h-5" /> Crear primer producto
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(React.createElement(App));
+  </script>
+</body>
+</html>
