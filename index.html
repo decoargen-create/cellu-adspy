@@ -93,7 +93,7 @@
     const TrendingUp = makeLucideIcon('trending-up');
     const Zap = makeLucideIcon('zap');
 
-    /* ═══════════ GENERADOR DOCX PROFESIONAL ═══════════ */
+    /* PPPPPPPPPPP GENERADOR DOCX PROFESIONAL PPPPPPPPPPP */
 
     // docx library is already loaded from CDN
     let docxLib = null;
@@ -106,13 +106,13 @@
     function getAdContent(ad) {
       const templates = {
         "Sexualidad + Transformacion": {
-          hook: "Tu vida sexual merece atencion especial — y vos tambien.",
-          body: `${ad.brand === "O Positiv" ? "CELLU+" : ad.brand} cuida las partes mas intimas y vulnerables de tu cuerpo para que puedas disfrutar sin preocupaciones.\n✅ Equilibra tu flora vaginal para sentirte segura.\n✅ Apoya un pH saludable y controla el olor.\n✅ Protege contra bacterias despues de las relaciones.\nMenos estres. Mas conexion. Mas vos.`,
-          cta: "Probalo Hoy — Envio Gratis",
+          hook: "Tu vida sexual merece atencion especial  y vos tambien.",
+          body: `${ad.brand === "O Positiv" ? "CELLU+" : ad.brand} cuida las partes mas intimas y vulnerables de tu cuerpo para que puedas disfrutar sin preocupaciones.\n Equilibra tu flora vaginal para sentirte segura.\n Apoya un pH saludable y controla el olor.\n Protege contra bacterias despues de las relaciones.\nMenos estres. Mas conexion. Mas vos.`,
+          cta: "Probalo Hoy  Envio Gratis",
           visual: "Mujer sonriente en ropa interior comoda, paleta calida, producto en primer plano con fondo organico.",
         },
         "Rutina + Pareja": {
-          hook: "¿Cuantas veces dejaste pasar un momento por inseguridad?",
+          hook: "�Cuantas veces dejaste pasar un momento por inseguridad?",
           body: "CELLU+ Probiotico Vaginal te da la confianza que necesitas con cepas clinicamente estudiadas + extracto de arandano. Mas de 50.000 resenas de 5 estrellas. pH equilibrado, sin olor, sin estres.",
           cta: "Empeza Tu Cambio Ahora",
           visual: "Close-up de manos sosteniendo el frasco de CELLU+, fondo desenfocado de pareja, tonos naranjas calidos.",
@@ -131,7 +131,7 @@
         },
       };
       const t = templates[ad.angle] || {
-        hook: `¿Sabias que ${ad.angle.toLowerCase()} puede cambiar tu bienestar intimo?`,
+        hook: `�Sabias que ${ad.angle.toLowerCase()} puede cambiar tu bienestar intimo?`,
         body: `CELLU+ te ofrece una solucion natural con cepas probioticas clinicamente estudiadas. Equilibra tu flora vaginal, controla el olor y sentite segura todos los dias. Sin quimicos, sin artificiales.`,
         cta: "Descubri CELLU+",
         visual: `Estatico profesional con producto CELLU+ en primer plano, estetica limpia y moderna.`,
@@ -170,7 +170,7 @@
 
       const allChildren = [];
 
-      // ── COVER PAGE ──
+      //    COVER PAGE   
       for (let i = 0; i < (isCreative ? 10 : 6); i++) allChildren.push(new Paragraph({ text: "" }));
       allChildren.push(new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "CELLU+ AdSpy", bold: true, size: 56, color: ORANGE, font: "Calibri" })] }));
       allChildren.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 200 }, children: [new TextRun({ text: isCreative ? "Brief Creativo para Disenador" : "Analisis Estrategico de Competencia", bold: true, size: 32, color: DARK, font: "Calibri" })] }));
@@ -181,7 +181,7 @@
       }
 
       if (isCreative) {
-        // ── SUMMARY TABLE ──
+        //    SUMMARY TABLE   
         allChildren.push(new Paragraph({ children: [new PageBreak()] }));
         allChildren.push(new Paragraph({ spacing: { before: 200, after: 100 }, children: [new TextRun({ text: "Resumen de Ads Adaptados", bold: true, size: 28, color: DARK, font: "Calibri" })] }));
         allChildren.push(new Paragraph({ spacing: { after: 200 }, children: [new TextRun({ text: `Se adaptaron los ${ads.length} ads mas relevantes para CELLU+.`, size: 20, color: DARK, font: "Calibri" })] }));
@@ -193,7 +193,7 @@
           ]
         }));
 
-        // ── INDIVIDUAL AD PAGES ──
+        //    INDIVIDUAL AD PAGES   
         ads.forEach((ad, idx) => {
           const content = getAdContent(ad);
           const mw = [2200, 2200, 2200, 2200];
@@ -221,7 +221,7 @@
         });
 
       } else {
-        // ── ANALISIS ESTRATEGICO ──
+        //    ANALISIS ESTRATEGICO   
         const angleCounts = {};
         const statusCounts = {};
         ads.forEach(a => { angleCounts[a.angle] = (angleCounts[a.angle] || 0) + 1; statusCounts[a.status] = (statusCounts[a.status] || 0) + 1; });
@@ -276,7 +276,7 @@
         const angles = [
           { t: "Angulo Argento: Cultura Local", h: "En Argentina Lo Resolvemos Diferente.", c: "Usar jerga local, humor sutil y referencias culturales argentinas.", f: "Video UGC o estatico con estetica informal argentina" },
           { t: "Angulo Menstrual: El Ciclo Completo", h: "Tu Flora Cambia con Tu Ciclo. CELLU+ Tambien.", c: "Conectar probioticos con el ciclo menstrual. Companero de todo el mes.", f: "Carrusel educativo con calendario + iconos por fase" },
-          { t: "Angulo Estrés y Flora Vaginal", h: "El Estres Te Descompensa Ahi Abajo Tambien.", c: "El cortisol afecta la flora vaginal. Mensaje que conecta profundamente.", f: "Estatico infografico o reel educativo corto" },
+          { t: "Angulo Estr�s y Flora Vaginal", h: "El Estres Te Descompensa Ahi Abajo Tambien.", c: "El cortisol afecta la flora vaginal. Mensaje que conecta profundamente.", f: "Estatico infografico o reel educativo corto" },
         ];
         const acw = [1500, 7300];
         angles.forEach((ang, i) => {
@@ -293,7 +293,7 @@
 
         // Section 5: Execution Plan
         allChildren.push(new Paragraph({ spacing: { before: 300, after: 150 }, children: [new TextRun({ text: "5. Plan de Ejecucion Recomendado", bold: true, size: 28, color: ORANGE, font: "Calibri" })] }));
-        allChildren.push(new Paragraph({ spacing: { before: 100, after: 60 }, children: [new TextRun({ text: "Semana 1-2: Las fáciles primero", bold: true, size: 22, color: DARK, font: "Calibri" })] }));
+        allChildren.push(new Paragraph({ spacing: { before: 100, after: 60 }, children: [new TextRun({ text: "Semana 1-2: Las f�ciles primero", bold: true, size: 22, color: DARK, font: "Calibri" })] }));
         allChildren.push(new Paragraph({ children: [new TextRun({ text: "Producir las adaptaciones directas. Son ads probados por la competencia, bajo riesgo.", size: 20, color: DARK, font: "Calibri" })] }));
         allChildren.push(new Paragraph({ spacing: { before: 150, after: 60 }, children: [new TextRun({ text: "Semana 3-4: Diferenciacion", bold: true, size: 22, color: DARK, font: "Calibri" })] }));
         allChildren.push(new Paragraph({ children: [new TextRun({ text: "Producir los angulos nuevos originales. Mayor riesgo pero mayor potencial de escala.", size: 20, color: DARK, font: "Calibri" })] }));
@@ -325,7 +325,7 @@
       setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
     }
 
-    /* ═══════════ ESTILOS & ANIMACIONES ═══════════ */
+    /* PPPPPPPPPPP ESTILOS & ANIMACIONES PPPPPPPPPPP */
     const styleSheet = `
       @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -486,7 +486,7 @@
       }
     `;
 
-    /* ───────── DATOS INICIALES ───────── */
+    /*           DATOS INICIALES           */
     const INITIAL_PRODUCTS = [
       {
         id: "cellu-probiotico",
@@ -511,7 +511,7 @@
             time: "14:32",
             newAds: 10,
             fileName: "CELLU_Adaptacion_Creativa_2026-04-08.pdf",
-            reportType: "Adaptación Creativa",
+            reportType: "Adaptaci�n Creativa",
             driveLink: "https://drive.google.com/drive/folders/1GEHkq4pl1o6dmqsEDBGKTtZtGXOs-Cpu",
             ads: [
               { id: "ad1", brand: "O Positiv", angle: "Sexualidad + Transformacion", headline: "Sentite Vos de Nuevo.", days: 223, status: "winner", priority: "ALTA", briefed: true, sentiment: "positive" },
@@ -543,7 +543,7 @@
       { key: "upload", label: "Subiendo a Google Drive...", duration: 1200 },
     ];
 
-    /* ────────┈ COMPONENTES AUXILIARES ────────┈ */
+    /*          COMPONENTES AUXILIARES          */
     function Badge({ children, color, variant = "solid" }) {
       const colors = {
         green: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
@@ -619,7 +619,7 @@
       );
     }
 
-    /* ────────┈ TOAST DE PROGRESO ───────── */
+    /*          TOAST DE PROGRESO           */
     function ProgressToast({ open, steps, currentStep, done, summary, onClose, onRedownload }) {
       const [minimized, setMinimized] = useState(false);
       if (!open) return null;
@@ -638,7 +638,7 @@
                   : <Loader2 className="w-4 h-4 text-orange-400 animate-spin flex-shrink-0" />}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-medium text-gray-300 truncate">{done ? "Sale como piña" : "Cocinando el brief..."}</span>
+                    <span className="text-xs font-medium text-gray-300 truncate">{done ? "Sale como pi�a" : "Cocinando el brief..."}</span>
                     <span className="text-xs text-gray-500 ml-2 font-medium">{pct}%</span>
                   </div>
                   <div className="h-1.5 bg-gray-800/50 rounded-full overflow-hidden">
@@ -666,7 +666,7 @@
                   ? <CheckCircle className="w-5 h-5 text-emerald-400" />
                   : <Loader2 className="w-5 h-5 text-orange-400 animate-spin" />}
                 <span className="text-sm font-semibold text-gray-100">
-                  {done ? "Listo papá, salió el brief" : "Generando brief..."}
+                  {done ? "Listo pap�, sali� el brief" : "Generando brief..."}
                 </span>
               </div>
               <div className="flex items-center gap-1">
@@ -718,7 +718,7 @@
             {done && summary && (
               <div className="px-5 py-4 border-t border-gray-700/30 space-y-3">
                 <div className="grid grid-cols-3 gap-2">
-                  <div className="bg-gray-800/40 rounded-lg px-3 py-2.5 text-center hover:bg-gray-800/60 transition-colors">
+                  <div className="bg-gray-800/70 rounded-lg px-3 py-2.5 text-center hover:bg-gray-800/60 transition-colors">
                     <div className="text-base font-bold text-orange-400"><AnimatedCounter value={summary.totalAds} /></div>
                     <div className="text-xs text-gray-500 mt-1">Avisos</div>
                   </div>
@@ -731,7 +731,7 @@
                     <div className="text-xs text-gray-500 mt-1">Urgentes</div>
                   </div>
                 </div>
-                <div className="bg-gray-800/40 rounded-lg px-4 py-3 hover:bg-gray-800/60 transition-colors">
+                <div className="bg-gray-800/70 rounded-lg px-4 py-3 hover:bg-gray-800/60 transition-colors">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-3 min-w-0">
                       <FileText className="w-4 h-4 text-orange-500 flex-shrink-0" />
@@ -759,7 +759,7 @@
       );
     }
 
-    /* ────────┈ DROP ZONE PARA ARCHIVOS ───────── */
+    /*          DROP ZONE PARA ARCHIVOS           */
     function FileDropZone({ files, onAdd, onRemove }) {
       const [dragging, setDragging] = useState(false);
       const [linkInput, setLinkInput] = useState("");
@@ -800,7 +800,7 @@
           >
             <Upload className={`w-7 h-7 mx-auto mb-3 transition-colors ${dragging ? "text-orange-400" : "text-gray-600"}`} />
             <p className="text-xs text-gray-300">
-              <span className="text-orange-400 font-semibold">Tirá los archivos acá</span> o hacé click
+              <span className="text-orange-400 font-semibold">Tir� los archivos ac�</span> o hac� click
             </p>
             <p className="text-xs text-gray-600 mt-1">PDF, DOCX, imagenes, lo que sea pa</p>
             <input ref={fileInputRef} type="file" multiple className="hidden" onChange={handleFileSelect}
@@ -847,7 +847,7 @@
       );
     }
 
-    /* ═══════════ APP PRINCIPAL ═══════════ */
+    /* PPPPPPPPPPP APP PRINCIPAL PPPPPPPPPPP */
     function App() {
       const [products, setProducts] = useState(INITIAL_PRODUCTS);
       const [selectedId, setSelectedId] = useState(INITIAL_PRODUCTS[0]?.id || null);
@@ -855,6 +855,15 @@
       const [formMode, setFormMode] = useState(null);
       const [editProduct, setEditProduct] = useState(null);
       const [dropdownOpen, setDropdownOpen] = useState(false);
+      const dropdownRef = useRef(null);
+      useEffect(() => {
+        const handleClickOutside = (e) => {
+          if (dropdownRef.current && !dropdownRef.current.contains(e.target)) setDropdownOpen(false);
+          setGenMenuOpen(false);
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+      }, []);
       const [newCompName, setNewCompName] = useState("");
       const [newCompQuery, setNewCompQuery] = useState("");
 
@@ -883,8 +892,8 @@
         (selected?.competitors || []).forEach(c => {
           base.push({ key: `scan-${c.query}`, label: `Escaneando Meta Ad Library: ${c.name}...`, duration: 1200 + Math.random() * 1000 });
         });
-        base.push({ key: "filter", label: "Filtrando ads nuevos (3+ días activos)...", duration: 1000 });
-        base.push({ key: "adapt", label: "Adaptando ángulos y estética a CELLU+...", duration: 2200 });
+        base.push({ key: "filter", label: "Filtrando ads nuevos (3+ d�as activos)...", duration: 1000 });
+        base.push({ key: "adapt", label: "Adaptando �ngulos y est�tica a CELLU+...", duration: 2200 });
         base.push({ key: "brief", label: "Generando reporte DOCX...", duration: 1800 });
         base.push({ key: "download", label: "Preparando descarga...", duration: 800 });
         return base;
@@ -918,6 +927,7 @@
       };
 
       const remove = () => {
+        if (!window.confirm("¿Posta querés eliminar \"" + editProduct.name + "\"? Esta acción no se puede deshacer, eh.")) return;
         const remaining = products.filter(p => p.id !== editProduct.id);
         setProducts(remaining);
         setSelectedId(remaining[0]?.id || null);
@@ -973,7 +983,7 @@
               ? latestReport?.ads.filter(a => selectedAds.has(a.id)) || []
               : latestReport?.ads || [];
             const today = new Date().toISOString().slice(0, 10);
-            const typeLabels = { creative: "Adaptación Creativa", strategic: "Análisis Estratégico", both: "Adaptación + Análisis" };
+            const typeLabels = { creative: "Adaptaci�n Creativa", strategic: "An�lisis Estrat�gico", both: "Adaptaci�n + An�lisis" };
 
             // === GENERATE REAL DOCX FILES ===
             (async () => {
@@ -983,14 +993,14 @@
                 if (type === "creative" || type === "both") {
                   const { blob, fileName } = await buildDocxBlob("creative", selected.name, adsInBrief, selected.competitors, selected.contextFiles);
                   generatedFiles.current[fileName] = blob;
-                  generated.push({ blob, fileName, reportType: "Adaptación Creativa" });
+                  generated.push({ blob, fileName, reportType: "Adaptaci�n Creativa" });
                   triggerDownload(blob, fileName);
                 }
 
                 if (type === "strategic" || type === "both") {
                   const { blob, fileName } = await buildDocxBlob("strategic", selected.name, adsInBrief, selected.competitors, selected.contextFiles);
                   generatedFiles.current[fileName] = blob;
-                  generated.push({ blob, fileName, reportType: "Análisis Estratégico" });
+                  generated.push({ blob, fileName, reportType: "An�lisis Estrat�gico" });
                   if (type === "both") {
                     setTimeout(() => triggerDownload(blob, fileName), 500);
                   } else {
@@ -1053,7 +1063,7 @@
         const now = new Date();
         const diff = now - date;
         const minutes = Math.floor(diff / 60000);
-        if (minutes < 1) return "Recién nomás";
+        if (minutes < 1) return "Reci�n nom�s";
         if (minutes < 60) return `Hace ${minutes} min`;
         const hours = Math.floor(minutes / 60);
         if (hours < 24) return `Hace ${hours} horas`;
@@ -1091,11 +1101,11 @@
                   <div className="w-px h-6 bg-gray-700/50" />
 
                   {/* Selector de producto */}
-                  <div className="relative">
+                  <div className="relative" ref={dropdownRef}>
                     <button onClick={() => setDropdownOpen(!dropdownOpen)}
                       className="flex items-center gap-2.5 bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-2 text-sm text-gray-200 hover:border-gray-600 hover:bg-gray-800 transition-all min-w-52">
                       <Package className="w-4 h-4 text-gray-500 flex-shrink-0" />
-                      <span className="truncate">{selected ? selected.name : "Elegí un producto"}</span>
+                      <span className="truncate">{selected ? selected.name : "Eleg� un producto"}</span>
                       <ChevronDown className="w-4 h-4 text-gray-500 ml-auto flex-shrink-0" />
                     </button>
 
@@ -1104,7 +1114,7 @@
                         {products.map((p, idx) => (
                           <button key={p.id}
                             onClick={() => { setSelectedId(p.id); setDropdownOpen(false); setView("report"); }}
-                            className={`w-full flex items-center justify-between px-4 py-3 text-sm hover:bg-gray-800/50 text-left transition-all ${p.id === selectedId ? "bg-orange-500/10 text-orange-400 border-l-2 border-orange-500" : "text-gray-300 border-l-2 border-transparent"}`}
+                            className={`w-full flex items-center justify-between px-4 py-3 text-sm hover:bg-gray-800/70 text-left transition-all ${p.id === selectedId ? "bg-orange-500/10 text-orange-400 border-l-2 border-orange-500" : "text-gray-300 border-l-2 border-transparent"}`}
                             style={{ animation: `fadeIn 200ms ease ${idx * 40}ms both` }}>
                             <span className="truncate font-medium">{p.name}</span>
                             {p.reports.length > 0 && <span className="text-xs text-gray-500">{p.reports[0].ads.length} ads</span>}
@@ -1140,13 +1150,13 @@
                         {genMenuOpen && (
                           <div className="absolute top-full right-0 mt-2 w-72 glass-effect rounded-xl shadow-2xl overflow-hidden z-30 border border-gray-700/50 animate-slideUp">
                             <button onClick={() => { setGenType("creative"); startGenerate("creative"); setGenMenuOpen(false); }}
-                              className="w-full text-left px-4 py-3 hover:bg-gray-800/50 transition-all border-b border-gray-700/30">
-                              <div className="text-sm font-medium text-gray-200">Brief de Adaptación Creativa</div>
+                              className="w-full text-left px-4 py-3 hover:bg-gray-800/70 transition-all border-b border-gray-700/30">
+                              <div className="text-sm font-medium text-gray-200">Brief de Adaptaci�n Creativa</div>
                               <div className="text-xs text-gray-500 mt-1">Le afanamos los mejores angulos a la competencia</div>
                             </button>
                             <button onClick={() => { setGenType("strategic"); startGenerate("strategic"); setGenMenuOpen(false); }}
-                              className="w-full text-left px-4 py-3 hover:bg-gray-800/50 transition-all border-b border-gray-700/30">
-                              <div className="text-sm font-medium text-gray-200">Análisis Estratégico</div>
+                              className="w-full text-left px-4 py-3 hover:bg-gray-800/70 transition-all border-b border-gray-700/30">
+                              <div className="text-sm font-medium text-gray-200">An�lisis Estrat�gico</div>
                               <div className="text-xs text-gray-500 mt-1">Patrones ganadores y angulos nuevos para romperla</div>
                             </button>
                             <button onClick={() => { setGenType("both"); startGenerate("both"); setGenMenuOpen(false); }}
@@ -1178,7 +1188,7 @@
             {/* ===== CONTENIDO ===== */}
             <div className="max-w-5xl mx-auto px-6 py-6">
 
-              {/* ──────── VISTA REPORTE ──────── */}
+              {/*          VISTA REPORTE          */}
               {view === "report" && selected && (
                 <div className="space-y-6 animate-fadeIn">
 
@@ -1242,6 +1252,12 @@
                   )}
 
                   {/* Reportes generados */}
+                  {selected.reports.length === 0 && (
+                    <div className="glass-effect rounded-xl border border-gray-700/30 p-8 text-center">
+                      <Package className="w-8 h-8 text-gray-600 mx-auto mb-3" />
+                      <p className="text-sm text-gray-500">Todavía no hay reportes. Dale al botón <span className="text-orange-400 font-semibold">Generar</span> para arrancar.</p>
+                    </div>
+                  )}
                   {selected.reports.length > 0 && (
                     <div className="glass-effect rounded-xl border border-gray-700/30 overflow-hidden">
                       <div className="px-5 py-4 border-b border-gray-700/30">
@@ -1249,7 +1265,7 @@
                       </div>
                       <div className="divide-y divide-gray-700/20">
                         {selected.reports.map((r, i) => (
-                          <div key={i} className="px-5 py-4 flex items-center justify-between hover:bg-gray-800/20 transition-all group" style={{ animation: `fadeIn 300ms ease ${i * 100}ms both` }}>
+                          <div key={i} className="px-5 py-4 flex items-center justify-between hover:bg-gray-800/40 transition-all group" style={{ animation: `fadeIn 300ms ease ${i * 100}ms both` }}>
                             <div className="flex items-center gap-3.5 flex-1">
                               <div className="w-10 h-10 bg-orange-500/10 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-orange-500/20 transition-colors">
                                 <FileText className="w-5 h-5 text-orange-500" />
@@ -1259,42 +1275,36 @@
                                   <span className="text-sm font-semibold text-gray-200">{r.fileName}</span>
                                   {r.reportType && (
                                     <Badge color={r.reportType.includes("Creativ") ? "orange" : "purple"}>
-                                      {r.reportType.includes("Creativ") ? "Adaptación" : "Estratégico"}
+                                      {r.reportType.includes("Creativ") ? "Adaptaci�n" : "Estrat�gico"}
                                     </Badge>
                                   )}
                                 </div>
                                 <div className="flex items-center gap-2 text-xs text-gray-500">
                                   <Clock className="w-3 h-3" />
                                   {r.date} {r.time && <span className="text-gray-600">a las {r.time}</span>}
-                                  <span className="text-gray-700">·</span>
+                                  <span className="text-gray-700">�</span>
                                   <Package className="w-3 h-3" />
                                   {r.newAds} ads
                                 </div>
                               </div>
                             </div>
                             <div className="flex items-center gap-2 flex-shrink-0">
-                              {r.driveLink ? (
-                                <a href={r.driveLink} target="_blank" rel="noopener noreferrer"
-                                  className="flex items-center gap-1 text-xs font-medium text-orange-400 hover:text-orange-300 bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/20 px-3 py-1.5 rounded-lg transition-all">
-                                  <Eye className="w-3.5 h-3.5" /> Ver en Drive
-                                </a>
-                              ) : (
-                                <button onClick={() => setViewingReport(viewingReport === i ? null : i)}
-                                  className="flex items-center gap-1 text-xs font-medium text-orange-400 hover:text-orange-300 bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/20 px-3 py-1.5 rounded-lg transition-all">
-                                  <Eye className="w-3.5 h-3.5" /> {viewingReport === i ? "Cerrar" : "Ver"}
-                                </button>
-                              )}
-                              {r.downloadable && generatedFiles.current[r.fileName] ? (
+                              <button onClick={() => setViewingReport(viewingReport === i ? null : i)}
+                                className="flex items-center gap-1 text-xs font-medium text-orange-400 hover:text-orange-300 bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/20 px-3 py-1.5 rounded-lg transition-all">
+                                <Eye className="w-3.5 h-3.5" /> {viewingReport === i ? "Cerrar" : "Ver"}
+                              </button>
+                              {r.downloadable && generatedFiles.current[r.fileName] && (
                                 <button onClick={() => downloadReport(r.fileName)}
                                   className="flex items-center gap-1 text-xs font-medium text-emerald-400 hover:text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 px-3 py-1.5 rounded-lg transition-all">
                                   <Download className="w-3.5 h-3.5" /> Descargar
                                 </button>
-                              ) : r.driveLink ? (
+                              )}
+                              {r.driveLink && (
                                 <a href={r.driveLink} target="_blank" rel="noopener noreferrer"
                                   className="flex items-center gap-1 text-xs font-medium text-cyan-400 hover:text-cyan-300 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/20 px-3 py-1.5 rounded-lg transition-all">
                                   <FolderOpen className="w-3.5 h-3.5" /> Drive
                                 </a>
-                              ) : null}
+                              )}
                             </div>
                           </div>
                         ))}
@@ -1302,8 +1312,8 @@
 
                       {/* Inline report viewer */}
                       {viewingReport !== null && selected.reports[viewingReport] && (
-                        <div className="border-t border-gray-700/30 bg-gray-950/50 animate-slideUp">
-                          <div className="px-5 py-3 flex items-center justify-between border-b border-gray-700/30 bg-gray-900/30">
+                        <div className="border-t border-gray-700/30 bg-gray-950/80 animate-slideUp">
+                          <div className="px-5 py-3 flex items-center justify-between border-b border-gray-700/30 bg-gray-900/50">
                             <span className="text-xs font-semibold text-gray-400">
                               Vista previa: {selected.reports[viewingReport].fileName}
                             </span>
@@ -1313,12 +1323,12 @@
                           </div>
                           <div className="p-4 max-h-96 overflow-y-auto space-y-2.5">
                             {selected.reports[viewingReport].ads.map((ad, ai) => (
-                              <div key={ai} className="bg-gray-900/50 rounded-lg border border-gray-700/30 p-3.5 hover:border-gray-600/50 transition-all" style={{ animation: `fadeIn 200ms ease ${ai * 30}ms both` }}>
+                              <div key={ai} className="bg-gray-900/70 rounded-lg border border-gray-700/30 p-3.5 hover:border-gray-600/50 transition-all" style={{ animation: `fadeIn 200ms ease ${ai * 30}ms both` }}>
                                 <div className="flex items-start justify-between mb-2">
                                   <div className="flex items-center gap-2.5 flex-1">
                                     <StatusDot status={ad.status} />
                                     <span className="text-xs font-medium text-gray-400">{ad.brand}</span>
-                                    <span className="text-xs text-gray-700">·</span>
+                                    <span className="text-xs text-gray-700">�</span>
                                     <span className="text-xs text-gray-300">{ad.angle}</span>
                                   </div>
                                   <div className="flex items-center gap-2">
@@ -1399,9 +1409,9 @@
                               </th>
                               <th className="text-center px-3 py-3 w-6"></th>
                               <th className="text-left px-4 py-3">Marca</th>
-                              <th className="text-left px-4 py-3">Ángulo</th>
+                              <th className="text-left px-4 py-3">�ngulo</th>
                               <th className="text-left px-4 py-3">Headline adaptado</th>
-                              <th className="text-center px-4 py-3 w-12">Días</th>
+                              <th className="text-center px-4 py-3 w-12">D�as</th>
                               <th className="text-center px-4 py-3 w-16">Prior.</th>
                               <th className="text-center px-4 py-3 w-10">Sent.</th>
                               <th className="text-center px-4 py-3 w-8"></th>
@@ -1469,9 +1479,9 @@
                             {genMenuOpen && (
                               <div className="absolute bottom-full right-0 mb-2 w-56 glass-effect rounded-xl shadow-2xl overflow-hidden z-30 border border-gray-700/50 animate-slideUp">
                                 <button onClick={() => { startGenerate("creative"); setGenMenuOpen(false); }}
-                                  className="w-full text-left px-4 py-3 hover:bg-gray-800/50 text-xs font-medium text-gray-200 border-b border-gray-700/30 transition-all">Adaptación Creativa</button>
+                                  className="w-full text-left px-4 py-3 hover:bg-gray-800/50 text-xs font-medium text-gray-200 border-b border-gray-700/30 transition-all">Adaptaci�n Creativa</button>
                                 <button onClick={() => { startGenerate("strategic"); setGenMenuOpen(false); }}
-                                  className="w-full text-left px-4 py-3 hover:bg-gray-800/50 text-xs font-medium text-gray-200 border-b border-gray-700/30 transition-all">Análisis Estratégico</button>
+                                  className="w-full text-left px-4 py-3 hover:bg-gray-800/50 text-xs font-medium text-gray-200 border-b border-gray-700/30 transition-all">An�lisis Estrat�gico</button>
                                 <button onClick={() => { startGenerate("both"); setGenMenuOpen(false); }}
                                   className="w-full text-left px-4 py-3 hover:bg-gray-800/50 text-xs font-medium text-orange-400 transition-all">Ambos Reportes</button>
                               </div>
@@ -1484,7 +1494,7 @@
                 </div>
               )}
 
-              {/* ──────── FORMULARIO NUEVO / EDITAR ──────── */}
+              {/*          FORMULARIO NUEVO / EDITAR          */}
               {view === "form" && editProduct && (
                 <div className="space-y-5 animate-fadeIn">
                   <div className="flex items-center justify-between">
@@ -1499,13 +1509,13 @@
                     )}
                   </div>
 
-                  {/* Datos básicos */}
+                  {/* Datos b�sicos */}
                   <div className="glass-effect rounded-xl border border-gray-700/30 p-5 space-y-4">
-                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Información básica</h3>
+                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Informaci�n b�sica</h3>
                     <div>
                       <label className="text-xs font-medium text-gray-400 block mb-2">Nombre del producto</label>
                       <input type="text" value={ep.name} onChange={e => setEp("name", e.target.value)}
-                        placeholder="Ej: CELLU+ Probiótico Vaginal" className={inputCls} />
+                        placeholder="Ej: CELLU+ Probi�tico Vaginal" className={inputCls} />
                     </div>
                     {/* Campos Landing y Drive sacados */}
                   </div>
@@ -1514,7 +1524,7 @@
                   <div className="glass-effect rounded-xl border border-gray-700/30 p-5">
                     <div className="mb-4">
                       <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Archivos y links de contexto</h3>
-                      <p className="text-xs text-gray-600 mt-2">Subí PDFs, documentos, imágenes o pegá links. Todo lo que sirva para entender la marca.</p>
+                      <p className="text-xs text-gray-600 mt-2">Sub� PDFs, documentos, im�genes o peg� links. Todo lo que sirva para entender la marca.</p>
                     </div>
                     <FileDropZone
                       files={ep.contextFiles}
@@ -1527,7 +1537,7 @@
                   <div className="glass-effect rounded-xl border border-gray-700/30 p-5">
                     <div className="mb-4">
                       <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Competidores a monitorear</h3>
-                      <p className="text-xs text-gray-600 mt-2">Marcas que vamos a espiar en Meta Ad Library, bancá.</p>
+                      <p className="text-xs text-gray-600 mt-2">Marcas que vamos a espiar en Meta Ad Library, banc�.</p>
                     </div>
                     {ep.competitors.length > 0 && (
                       <div className="space-y-2 mb-4">
@@ -1536,7 +1546,7 @@
                             <div className="flex items-center gap-3">
                               <Search className="w-4 h-4 text-gray-600" />
                               <span className="text-sm font-medium text-gray-200">{c.name}</span>
-                              <span className="text-xs text-gray-600">· {c.query}</span>
+                              <span className="text-xs text-gray-600">� {c.query}</span>
                             </div>
                             <button onClick={() => setEp("competitors", ep.competitors.filter((_, idx) => idx !== i))}
                               className="text-gray-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all hover:scale-110">
